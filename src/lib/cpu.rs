@@ -99,9 +99,19 @@ impl CPU {
         debug!("[CPU][Decoded at PC: 0x{:02x}] {}", self.registers.get_pc(), instr);
     }
 
+    fn alu16_add(&mut self, a: u16, n: u16) {
+        let result = a.wrapping_add(n);
+        self.registers.flg.set_flg_zero(false);
+        self.registers.flg.set_flg_sub(false);
+        self.registers.flg.set_flg_half_carry(value: bool)
+        // TODO
+    }
+
     fn alu8_add(&mut self, a: u8, n: u8) {
-        /*let result = a.wrapping_add(n);
-        self.set_flag_z(result == 0);*/
+        let result = a.wrapping_add(n);
+        self.registers.flg.set_flg_zero(false);
+        self.registers.flg.set_flg_sub(false);
+        // TODO
     }
 
     pub fn decode_inst(&mut self, byte: u8) -> u8 {
