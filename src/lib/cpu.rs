@@ -101,24 +101,100 @@ impl CPU {
     fn debug_instr(&self, instr: String) {
         debug!(
             "[CPU][Decoded at PC: 0x{:02x}] {}",
-            self.registers.get_pc(),
+            self.registers.get_pc() - 2,
             instr
         );
     }
 
-    fn alu16_add(&mut self, a: u16, n: u16) {
+    fn alu16_add_with_carry(
+        &mut self,
+        a: u16,
+        n: u16,
+        carry: u16,
+        half_carry: u16,
+        set_zero: bool,
+    ) -> u16 {
         let result = a.wrapping_add(n);
-        // self.registers.flg.set_flg_zero(false);
-        // self.registers.flg.set_flg_sub(false);
-        // self.registers.flg.set_flg_half_carry(value)
-        // TODO
+        // Set flags
+        if set_zero {
+            self.registers.get_flg().set_flg_zero(result == 0);
+        }
+        self.registers.get_flg().set_flg_sub(false);
+
+        self.registers.get_flg().set_flg_half_carry(
+            ((a & half_carry) as u32 + (n & half_carry) as u32) > half_carry as u32,
+        );
+
+        self.registers
+            .get_flg()
+            .set_flg_carry(((a & carry) as u32 + (n & carry) as u32) > carry as u32);
+
+        result
     }
 
-    fn alu8_add(&mut self, a: u8, n: u8) {
+    fn alu16_add(&mut self, a: u16, n: u16, set_zero: bool) -> u16 {
+        self.alu16_add_with_carry(a, n, 0xFFFF, 0xFFF, set_zero)
+    }
+
+    fn alu8_add_with_carry(
+        &mut self,
+        a: u8,
+        n: u8,
+        set_zero: bool,
+        carry: u8,
+        half_carry: u8,
+    ) -> u8 {
         let result = a.wrapping_add(n);
-        // self.registers.flg.set_flg_zero(false);
-        // self.registers.flg.set_flg_sub(false);
-        // TODO
+        // Set flags
+        if set_zero {
+            self.registers.get_flg().set_flg_zero(result == 0);
+        }
+        self.registers.get_flg().set_flg_sub(false);
+        self.registers.get_flg().set_flg_half_carry(
+            ((a & half_carry) as u16 + (n & half_carry) as u16) > half_carry as u16,
+        );
+
+        self.registers
+            .get_flg()
+            .set_flg_carry(((a & carry) as u16 + (n & carry) as u16) > carry as u16);
+
+        result
+    }
+
+    fn alu8_add(&mut self, a: u8, n: u8, set_zero: bool) -> u8 {
+        self.alu8_add_with_carry(a, n, set_zero, 0xFF, 0xF)
+    }
+
+    fn alu8_adc_with_carry(
+        &mut self,
+        a: u8,
+        n: u8,
+        carry_enabled: bool,
+        set_zero: bool,
+        carry_mask: u8,
+        half_carry_mask: u8,
+    ) -> u8 {
+        let c: u8 = if carry_enabled { 1 } else { 0 };
+        let result = a.wrapping_add(n).wrapping_add(c);
+        // Set flags
+        if set_zero {
+            self.registers.get_flg().set_flg_zero(result == 0);
+        }
+        self.registers.get_flg().set_flg_sub(false);
+        self.registers.get_flg().set_flg_half_carry(
+            ((a & half_carry_mask) as u16 + (n & half_carry_mask) as u16 + c as u16)
+                > half_carry_mask as u16,
+        );
+
+        self.registers.get_flg().set_flg_carry(
+            ((a & carry_mask) as u16 + (n & carry_mask) as u16 + c as u16) > carry_mask as u16,
+        );
+
+        result
+    }
+
+    fn alu8_adc(&mut self, a: u8, n: u8, carry_enabled: bool, set_zero: bool) -> u8 {
+        self.alu8_adc_with_carry(a, n, carry_enabled, set_zero, 0xFF, 0xF)
     }
 
     pub fn decode_inst(&mut self, byte: u8) -> u8 {
@@ -683,7 +759,7 @@ impl CPU {
             0x7E => {
                 // "LD A,(HL)"
                 let hl = self.registers.get_hl();
-                self.debug_instr(format!("LD Reg A <- *(HL) (0x{:02x})", hl));
+                self.debug_instr(format!("LD (A) <- *(HL) (0x{:02x})", hl));
                 self.registers.set_a(self.mmu.rb(hl));
                 2
             }
@@ -694,10 +770,201 @@ impl CPU {
                 1
             }
             // G8X
+            0x80 => {
+                // "ADD A,B"
+                self.debug_instr(format!("ADD (A, B={:02x})", self.registers.get_b()));
+                let result = self.alu8_add(self.registers.get_a(), self.registers.get_b(), true);
+                self.registers.set_a(result);
+                1
+            }
+            0x81 => {
+                // "ADD A,C"
+                self.debug_instr(format!("ADD (A, C={:02x})", self.registers.get_c()));
+                let result = self.alu8_add(self.registers.get_a(), self.registers.get_c(), true);
+                self.registers.set_a(result);
+                1
+            }
+            0x82 => {
+                // "ADD A,D"
+                self.debug_instr(format!("ADD (A, D={:02x})", self.registers.get_d()));
+                let result = self.alu8_add(self.registers.get_a(), self.registers.get_d(), true);
+                self.registers.set_a(result);
+                1
+            }
+            0x83 => {
+                // "ADD A,E"
+                self.debug_instr(format!("ADD (A, E={:02x})", self.registers.get_e()));
+                let result = self.alu8_add(self.registers.get_a(), self.registers.get_e(), true);
+                self.registers.set_a(result);
+                1
+            }
+            0x84 => {
+                // "ADD A,H"
+                self.debug_instr(format!("ADD (A, H={:02x})", self.registers.get_h()));
+                let result = self.alu8_add(self.registers.get_a(), self.registers.get_h(), true);
+                self.registers.set_a(result);
+                1
+            }
+            0x85 => {
+                // "ADD A,L"
+                self.debug_instr(format!("ADD (A, L={:02x})", self.registers.get_l()));
+                let result = self.alu8_add(self.registers.get_a(), self.registers.get_l(), true);
+                self.registers.set_a(result);
+                1
+            }
+            0x86 => {
+                // "ADD A,(HL)"
+                let hl = self.registers.get_hl();
+                let content = self.mmu.rb(hl);
+                self.debug_instr(format!(
+                    "ADD (A, *(HL) (0x{:04x}, content={:02x})",
+                    hl, content
+                ));
+                let result = self.alu8_add(self.registers.get_a(), content, true);
+                self.registers.set_a(result);
+                2
+            }
+            0x87 => {
+                // "ADD A,A"
+                let value = self.registers.get_a();
+                self.debug_instr(format!("ADD (A, A={:02x})", value));
+                let result = self.alu8_add(value, value, true);
+                self.registers.set_a(result);
+                1
+            }
+            0x88 => {
+                // "ADC A,B"
+                let carry = self.registers.get_flg().get_flg_carry();
+                self.debug_instr(format!(
+                    "ADC (A, B={:02x}) - Carry flag: {}",
+                    self.registers.get_b(),
+                    carry
+                ));
+
+                let result =
+                    self.alu8_adc(self.registers.get_a(), self.registers.get_b(), carry, true);
+
+                self.registers.set_a(result);
+                1
+            }
+            0x89 => {
+                // "ADC A,C"
+                let carry = self.registers.get_flg().get_flg_carry();
+                self.debug_instr(format!(
+                    "ADC (A, C={:02x}) - Carry flag: {}",
+                    self.registers.get_c(),
+                    carry
+                ));
+
+                let result =
+                    self.alu8_adc(self.registers.get_a(), self.registers.get_c(), carry, true);
+
+                self.registers.set_a(result);
+                1
+            }
+            0x8A => {
+                // "ADC A,D"
+                let carry = self.registers.get_flg().get_flg_carry();
+                self.debug_instr(format!(
+                    "ADC (A, D={:02x}) - Carry flag: {}",
+                    self.registers.get_d(),
+                    carry
+                ));
+
+                let result =
+                    self.alu8_adc(self.registers.get_a(), self.registers.get_d(), carry, true);
+
+                self.registers.set_a(result);
+                1
+            }
+            0x8B => {
+                // "ADC A,E"
+                let carry = self.registers.get_flg().get_flg_carry();
+                self.debug_instr(format!(
+                    "ADC (A, E={:02x}) - Carry flag: {}",
+                    self.registers.get_e(),
+                    carry
+                ));
+
+                let result =
+                    self.alu8_adc(self.registers.get_a(), self.registers.get_e(), carry, true);
+
+                self.registers.set_a(result);
+                1
+            }
+            0x8C => {
+                // "ADC A,H"
+                let carry = self.registers.get_flg().get_flg_carry();
+                self.debug_instr(format!(
+                    "ADC (A, H={:02x}) - Carry flag: {}",
+                    self.registers.get_h(),
+                    carry
+                ));
+
+                let result =
+                    self.alu8_adc(self.registers.get_a(), self.registers.get_h(), carry, true);
+
+                self.registers.set_a(result);
+                1
+            }
+            0x8D => {
+                // "ADC A,L"
+                let carry = self.registers.get_flg().get_flg_carry();
+                self.debug_instr(format!(
+                    "ADC (A, L={:02x}) - Carry flag: {}",
+                    self.registers.get_l(),
+                    carry
+                ));
+
+                let result =
+                    self.alu8_adc(self.registers.get_a(), self.registers.get_l(), carry, true);
+
+                self.registers.set_a(result);
+                1
+            }
+            0x8E => {
+                // "ADC A,(HL)"
+                let carry = self.registers.get_flg().get_flg_carry();
+                let hl = self.registers.get_hl();
+                let content = self.mmu.rb(hl);
+                self.debug_instr(format!(
+                    "ADC (A, *(HL) (0x{:04x}, content={:02x})- Carry flag: {}",
+                    hl, content, carry
+                ));
+                let result = self.alu8_adc(self.registers.get_a(), content, carry, true);
+                self.registers.set_a(result);
+                2
+            }
+            0x8F => {
+                // "ADC A,A"
+                let value = self.registers.get_a();
+                let carry = self.registers.get_flg().get_flg_carry();
+                self.debug_instr(format!("ADC (A, A={:02x}) - Carry flag: {}", value, carry));
+                let result = self.alu8_adc(value, value, carry, true);
+                self.registers.set_a(result);
+                1
+            }
             // G9X
             // GAX
             // GBX
             // GCX
+            0xC6 => {
+                // "ADD A,n"
+                let value = self.nextb();
+                self.debug_instr(format!("ADD (A, n={:02x})", value));
+                let result = self.alu8_add(self.registers.get_a(), value, true);
+                self.registers.set_a(result);
+                2
+            }
+            0xCE => {
+                // "ADC A,n"
+                let value = self.nextb();
+                let carry = self.registers.get_flg().get_flg_carry();
+                self.debug_instr(format!("ADD (A, n={:02x}) - Carry flag {}", value, carry));
+                let result = self.alu8_adc(self.registers.get_a(), value, carry, true);
+                self.registers.set_a(result);
+                2
+            }
             // GCX
             // GDX
             // GEX
@@ -750,14 +1017,12 @@ impl CPU {
             }
             0xF8 => {
                 // "LD HL,SP+(n)"
-                let addr_offset = self.nextb();
-                let addr = self.registers.get_sp() + addr_offset as u16;
-                self.debug_instr(format!(
-                    "LDHL HL <- SP (0x{:04x}) + n (0x{:02x})",
-                    self.registers.get_sp(),
-                    addr
-                ));
-                // TODO: finish
+                let n = self.nextb() as u8 as i8;
+                let sp = self.registers.get_sp();
+                self.debug_instr(format!("LDHL HL <- SP (0x{:04x}) + n (0x{:02x})", sp, n));
+                self.registers.get_flg().set_flg_zero(false); // The previous alu call will not reset zero
+                let result = self.alu16_add_with_carry(sp, n as u16, 0xFF, 0xF, false);
+                self.registers.set_hl(result);
                 3
             }
             0xF9 => {
