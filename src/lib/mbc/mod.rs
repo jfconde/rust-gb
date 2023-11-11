@@ -9,32 +9,32 @@ pub const C_TYPE_MBC1_RAM_BATT: u8 = 0x03;
 pub const C_TYPE_MBC2: u8 = 0x05;
 pub const C_TYPE_MBC2_BATT: u8 = 0x06;*/
 
-pub trait mbc {
+pub trait MBC {
     fn read(&self, addr: u16) -> u8;
     fn write(&mut self, addr: u16, byte: u8);
     fn get_type(&self) -> &str;
 }
 
-pub enum mbcType {
+pub enum MbcType {
     MBC0(MBC0)
 }
 
-impl mbc for mbcType {
+impl MBC for MbcType {
     fn read(&self, addr: u16) -> u8 {
         match *self {
-            mbcType::MBC0(ref mbc0) => mbc0.read(addr)
+            MbcType::MBC0(ref mbc0) => mbc0.read(addr)
         }
     }
 
     fn write(&mut self, addr: u16, byte: u8) {
         match *self {
-            mbcType::MBC0(ref mut mbc0) => mbc0.write(addr, byte)
+            MbcType::MBC0(ref mut mbc0) => mbc0.write(addr, byte)
         }
     }
 
     fn get_type(&self) -> &str {
         match * self {
-            mbcType::MBC0(ref mbc0) => mbc0.get_type()
+            MbcType::MBC0(ref mbc0) => mbc0.get_type()
         }
     }
 }
@@ -43,10 +43,10 @@ impl mbc for mbcType {
 pub struct MBCBuilder {}
 
 impl MBCBuilder {
-    pub fn from_rom (rom: &Vec<u8>) -> Option<mbcType> {
+    pub fn from_rom (rom: &Vec<u8>) -> Option<MbcType> {
         let cart_type_byte = rom[ADDR_CARTRIDGE_TYPE as usize];
         return match cart_type_byte {
-            C_TYPE_MBC0 => Some(mbcType::MBC0(MBC0::from_rom(rom))),
+            C_TYPE_MBC0 => Some(MbcType::MBC0(MBC0::from_rom(rom))),
             _ => None
         }
     }

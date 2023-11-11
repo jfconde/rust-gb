@@ -1,9 +1,6 @@
-use super::gpu;
-use super::mbc;
-use super::mmu;
 use super::cpu_registers;
-use std::collections::HashMap;
-use std::fmt;
+use super::gpu;
+use super::mmu;
 use std::io::stdin;
 
 const SP_INITIAL_VALUE: u16 = 0xFFFE;
@@ -13,9 +10,8 @@ const REG_U8_COUNT: usize = 8;
 pub struct CPU {
     gpu: gpu::GPU,
     mmu: mmu::MMU,
-    registers: cpu_registers::CPURegisters
+    registers: cpu_registers::CPURegisters,
 }
-
 
 fn merge_bytes(upper_byte: u8, lower_byte: u8) -> u16 {
     (upper_byte as u16) << 8 | (lower_byte as u16)
@@ -27,10 +23,9 @@ impl CPU {
         CPU {
             gpu: gpu::GPU::new(),
             mmu: mmu::MMU::new(),
-            registers: cpu_registers::CPURegisters::new()
+            registers: cpu_registers::CPURegisters::new(),
         }
     }
-
 
     pub fn exec_inst(&mut self) -> u8 {
         let next_inst = self.nextb();
@@ -50,28 +45,34 @@ impl CPU {
             self.registers.get_h(),
             self.registers.get_l(),
         );
-        debug!("[Registers] SP: {:02x}, PC: {:02x}, ",
+        debug!(
+            "[Registers] SP: {:02x}, PC: {:02x}, ",
             self.registers.get_sp(),
             self.registers.get_pc(),
         );
     }
 
     pub fn read_rom(&mut self, rom: &Vec<u8>) {
-        &self.mmu.reset();
-        &self.mmu.read_rom(&rom);
+        let _ = &self.mmu.reset();
+        let _ = &self.mmu.read_rom(&rom);
     }
 
     pub fn start(&mut self) {
         let mut input = String::new();
         loop {
-            if true /* TODO: interactive check */ {
+            if true
+            /* TODO: interactive check */
+            {
                 if input.eq("d\n") {
                     self.dump_status();
-                }else{
+                } else {
                     self.exec_inst();
                 }
                 input.clear();
-                stdin().read_line(&mut input);
+                match stdin().read_line(&mut input) {
+                    Ok(read_count) => {}
+                    Err(error) => panic!("Error reading next line."),
+                }
             }
         }
     }
@@ -89,28 +90,34 @@ impl CPU {
     }
 
     fn dec_hl(&mut self) -> u16 {
-        self.registers.set_hl(self.registers.get_hl().wrapping_sub(1))
+        self.registers
+            .set_hl(self.registers.get_hl().wrapping_sub(1))
     }
     fn inc_hl(&mut self) -> u16 {
-        self.registers.set_hl(self.registers.get_hl().wrapping_add(1))
+        self.registers
+            .set_hl(self.registers.get_hl().wrapping_add(1))
     }
 
     fn debug_instr(&self, instr: String) {
-        debug!("[CPU][Decoded at PC: 0x{:02x}] {}", self.registers.get_pc(), instr);
+        debug!(
+            "[CPU][Decoded at PC: 0x{:02x}] {}",
+            self.registers.get_pc(),
+            instr
+        );
     }
 
     fn alu16_add(&mut self, a: u16, n: u16) {
         let result = a.wrapping_add(n);
-        self.registers.flg.set_flg_zero(false);
-        self.registers.flg.set_flg_sub(false);
-        self.registers.flg.set_flg_half_carry(value: bool)
+        // self.registers.flg.set_flg_zero(false);
+        // self.registers.flg.set_flg_sub(false);
+        // self.registers.flg.set_flg_half_carry(value)
         // TODO
     }
 
     fn alu8_add(&mut self, a: u8, n: u8) {
         let result = a.wrapping_add(n);
-        self.registers.flg.set_flg_zero(false);
-        self.registers.flg.set_flg_sub(false);
+        // self.registers.flg.set_flg_zero(false);
+        // self.registers.flg.set_flg_sub(false);
         // TODO
     }
 
@@ -572,37 +579,61 @@ impl CPU {
             // G7X
             0x70 => {
                 // LD (HL), B
-                self.debug_instr(format!("LD (HL={:02x}) <- (B={:02x})", self.registers.get_hl(), self.registers.get_b()));
+                self.debug_instr(format!(
+                    "LD (HL={:02x}) <- (B={:02x})",
+                    self.registers.get_hl(),
+                    self.registers.get_b()
+                ));
                 self.mmu.wb(self.registers.get_hl(), self.registers.get_b());
                 2
             }
             0x71 => {
                 // LD (HL), C
-                self.debug_instr(format!("LD (HL={:02x}) <- (C={:02x})", self.registers.get_hl(), self.registers.get_c()));
+                self.debug_instr(format!(
+                    "LD (HL={:02x}) <- (C={:02x})",
+                    self.registers.get_hl(),
+                    self.registers.get_c()
+                ));
                 self.mmu.wb(self.registers.get_hl(), self.registers.get_c());
                 2
             }
             0x72 => {
                 // LD (HL), D
-                self.debug_instr(format!("LD (HL={:02x}) <- (D={:02x})", self.registers.get_hl(), self.registers.get_d()));
+                self.debug_instr(format!(
+                    "LD (HL={:02x}) <- (D={:02x})",
+                    self.registers.get_hl(),
+                    self.registers.get_d()
+                ));
                 self.mmu.wb(self.registers.get_hl(), self.registers.get_d());
                 2
             }
             0x73 => {
                 // LD (HL), E
-                self.debug_instr(format!("LD (HL={:02x}) <- (E={:02x})", self.registers.get_hl(), self.registers.get_e()));
+                self.debug_instr(format!(
+                    "LD (HL={:02x}) <- (E={:02x})",
+                    self.registers.get_hl(),
+                    self.registers.get_e()
+                ));
                 self.mmu.wb(self.registers.get_hl(), self.registers.get_e());
                 2
             }
             0x74 => {
                 // LD (HL), H
-                self.debug_instr(format!("LD (HL={:02x}) <- (H={:02x})", self.registers.get_hl(), self.registers.get_h()));
+                self.debug_instr(format!(
+                    "LD (HL={:02x}) <- (H={:02x})",
+                    self.registers.get_hl(),
+                    self.registers.get_h()
+                ));
                 self.mmu.wb(self.registers.get_hl(), self.registers.get_h());
                 2
             }
             0x75 => {
                 // LD (HL), L
-                self.debug_instr(format!("LD (HL={:02x}) <- (L={:02x})", self.registers.get_hl(), self.registers.get_l()));
+                self.debug_instr(format!(
+                    "LD (HL={:02x}) <- (L={:02x})",
+                    self.registers.get_hl(),
+                    self.registers.get_l()
+                ));
                 self.mmu.wb(self.registers.get_hl(), self.registers.get_l());
                 2
             }
@@ -674,7 +705,10 @@ impl CPU {
                 // "LDH (n),A"
                 let addr_offset = self.nextb();
                 let value = self.registers.get_a();
-                self.debug_instr(format!("LDH ( $FF00 + {:02x}) <- (A={:02x})", addr_offset, value));
+                self.debug_instr(format!(
+                    "LDH ( $FF00 + {:02x}) <- (A={:02x})",
+                    addr_offset, value
+                ));
                 self.mmu.wb(0xFF00 | addr_offset as u16, value);
                 3
             }
@@ -700,7 +734,7 @@ impl CPU {
             // GFX
             0xF0 => {
                 // "LDH A,(n)"
-                let addr_offset = self.nextb(); 
+                let addr_offset = self.nextb();
                 let addr = 0xFF00 | addr_offset as u16;
                 self.debug_instr(format!("LD A <- 0xFF00 + n (0x{:02x})", addr_offset));
                 self.registers.set_a(self.mmu.rb(addr));
@@ -716,10 +750,14 @@ impl CPU {
             }
             0xF8 => {
                 // "LD HL,SP+(n)"
-                let addr_offset = self.nextb(); 
+                let addr_offset = self.nextb();
                 let addr = self.registers.get_sp() + addr_offset as u16;
-                self.debug_instr(format!("LDHL HL <- SP (0x{:04x}) + n (0x{:02x})", self.registers.get_sp(), addr));
-                // TODO: finish                
+                self.debug_instr(format!(
+                    "LDHL HL <- SP (0x{:04x}) + n (0x{:02x})",
+                    self.registers.get_sp(),
+                    addr
+                ));
+                // TODO: finish
                 3
             }
             0xF9 => {
@@ -740,7 +778,8 @@ impl CPU {
             _ => {
                 warn!(
                     "[Decoded at PC: 0x{:02x}]  OPCODE: 0x{:02x}",
-                    self.registers.get_pc(), byte
+                    self.registers.get_pc(),
+                    byte
                 );
                 return 0;
             }
@@ -751,4 +790,3 @@ impl CPU {
 #[cfg(test)]
 #[path = "./cpu_test.rs"]
 mod cpu_test;
- 

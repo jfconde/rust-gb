@@ -1,4 +1,4 @@
-use super::mbc;
+use super::MBC;
 
 pub struct MBC0 {
     data: Vec<u8>,
@@ -22,7 +22,7 @@ impl MBC0 {
     }
 }
 
-impl mbc for MBC0 {
+impl MBC for MBC0 {
     fn read(&self, addr: u16) -> u8 {
         if (addr as u32) >= self.rom_size {
             panic!("MBC::MBC0 tried to read from unaccessible memory location")

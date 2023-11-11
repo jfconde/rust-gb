@@ -1,13 +1,13 @@
 //use std::convert::TryFrom;
 use super::ram;
 use super::mbc::MBCBuilder;
-use super::mbc::mbc;
-use super::mbc::mbcType;
+use super::mbc::MBC;
+use super::mbc::MbcType;
 
 const MEMORY_SIZE: usize = 65535;
 
 pub struct MMU {
-    mbc: Option<mbcType>,
+    mbc: Option<MbcType>,
     ram: ram::RAM,
     mmap: [u8; 0xffff]
 }
