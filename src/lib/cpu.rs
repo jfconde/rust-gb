@@ -116,7 +116,7 @@ impl CPU {
     ) -> u16 {
         let result = a.wrapping_add(n);
         // Set flags
-        if set_zero {
+        if set_zero && result == 0 {
             self.registers.get_flg().set_flg_zero(result == 0);
         }
         self.registers.get_flg().set_flg_sub(false);
@@ -146,7 +146,7 @@ impl CPU {
     ) -> u8 {
         let result = a.wrapping_add(n);
         // Set flags
-        if set_zero {
+        if set_zero && result == 0 {
             self.registers.get_flg().set_flg_zero(result == 0);
         }
         self.registers.get_flg().set_flg_sub(false);
@@ -177,7 +177,7 @@ impl CPU {
         let c: u8 = if carry_enabled { 1 } else { 0 };
         let result = a.wrapping_add(n).wrapping_add(c);
         // Set flags
-        if set_zero {
+        if set_zero && result == 0 {
             self.registers.get_flg().set_flg_zero(result == 0);
         }
         self.registers.get_flg().set_flg_sub(false);
@@ -200,6 +200,11 @@ impl CPU {
     pub fn decode_inst(&mut self, byte: u8) -> u8 {
         match byte {
             // G0X
+            0x00 => {
+                // NOP
+                self.debug_instr(String::from("NOP"));
+                1
+            }
             0x01 => {
                 // "LD BC,nn"
                 let value_lo = self.nextb();
@@ -216,6 +221,39 @@ impl CPU {
                 self.mmu.wb(self.registers.get_bc(), value);
                 2
             }
+            0x03 => {
+                // "INC BC"
+                let value = self.registers.get_bc();
+                self.debug_instr(format!("INC BC (0x{:02x})", value));
+                self.registers.set_bc(value.wrapping_add(1));
+                2
+            }
+            0x04 => {
+                // "INC B"
+                let value = self.registers.get_b();
+                self.debug_instr(format!("INC B (0x{:02x})", value));
+                let inc = value.wrapping_add(1);
+                self.registers.set_b(inc);
+                self.registers.get_flg().set_flg_sub(false);
+                self.registers
+                    .get_flg()
+                    .set_flg_half_carry(((value & 0xF) + 1) > 0xF);
+                self.registers.get_flg().set_flg_zero(inc == 0);
+                1
+            }
+            0x05 => {
+                // "DEC B"
+                let value = self.registers.get_b();
+                let dec = value.wrapping_sub(1);
+                self.debug_instr(format!("DEC B (0x{:02x})", value));
+                self.registers.set_b(dec);
+                self.registers.get_flg().set_flg_sub(true);
+                self.registers
+                    .get_flg()
+                    .set_flg_half_carry((value & 0xF) == 0);
+                self.registers.get_flg().set_flg_zero(dec == 0);
+                1
+            }
             0x06 => {
                 // "LD B,n"
                 let value = self.nextb();
@@ -229,6 +267,32 @@ impl CPU {
                 self.debug_instr(format!("LD Reg A <- *(BC) (0x{:02x})", bc));
                 self.registers.set_a(self.mmu.rb(bc));
                 2
+            }
+            0x0C => {
+                // "INC C"
+                let value = self.registers.get_c();
+                self.debug_instr(format!("INC C (0x{:02x})", value));
+                let inc = value.wrapping_add(1);
+                self.registers.set_c(inc);
+                self.registers.get_flg().set_flg_sub(false);
+                self.registers
+                    .get_flg()
+                    .set_flg_half_carry(((value & 0xF) + 1) > 0xF);
+                self.registers.get_flg().set_flg_zero(inc == 0);
+                1
+            }
+            0x0D => {
+                // "DEC C"
+                let value = self.registers.get_c();
+                let dec = value.wrapping_sub(1);
+                self.debug_instr(format!("DEC C (0x{:02x})", value));
+                self.registers.set_c(dec);
+                self.registers.get_flg().set_flg_sub(true);
+                self.registers
+                    .get_flg()
+                    .set_flg_half_carry((value & 0xF) == 0);
+                self.registers.get_flg().set_flg_zero(dec == 0);
+                1
             }
             0x0E => {
                 // "LD C,n"
@@ -254,6 +318,39 @@ impl CPU {
                 self.mmu.wb(self.registers.get_de(), value);
                 2
             }
+            0x13 => {
+                // "INC DE"
+                let value = self.registers.get_de();
+                self.debug_instr(format!("INC DE (0x{:02x})", value));
+                self.registers.set_de(value.wrapping_add(1));
+                2
+            }
+            0x14 => {
+                // "INC D"
+                let value = self.registers.get_d();
+                self.debug_instr(format!("INC D (0x{:02x})", value));
+                let inc = value.wrapping_add(1);
+                self.registers.set_d(inc);
+                self.registers.get_flg().set_flg_sub(false);
+                self.registers
+                    .get_flg()
+                    .set_flg_half_carry(((value & 0xF) + 1) > 0xF);
+                self.registers.get_flg().set_flg_zero(inc == 0);
+                1
+            }
+            0x15 => {
+                // "DEC D"
+                let value = self.registers.get_d();
+                let dec = value.wrapping_sub(1);
+                self.debug_instr(format!("DEC D (0x{:02x})", value));
+                self.registers.set_d(dec);
+                self.registers.get_flg().set_flg_sub(true);
+                self.registers
+                    .get_flg()
+                    .set_flg_half_carry((value & 0xF) == 0);
+                self.registers.get_flg().set_flg_zero(dec == 0);
+                1
+            }
             0x16 => {
                 // "LD D,n"
                 let value = self.nextb();
@@ -268,6 +365,32 @@ impl CPU {
                 let value = self.mmu.rb(de);
                 self.registers.set_a(value);
                 2
+            }
+            0x1C => {
+                // "INC E"
+                let value = self.registers.get_e();
+                self.debug_instr(format!("INC E (0x{:02x})", value));
+                let inc = value.wrapping_add(1);
+                self.registers.set_e(inc);
+                self.registers.get_flg().set_flg_sub(false);
+                self.registers
+                    .get_flg()
+                    .set_flg_half_carry(((value & 0xF) + 1) > 0xF);
+                self.registers.get_flg().set_flg_zero(inc == 0);
+                1
+            }
+            0x1D => {
+                // "DEC D"
+                let value = self.registers.get_e();
+                let dec = value.wrapping_sub(1);
+                self.debug_instr(format!("DEC E (0x{:02x})", value));
+                self.registers.set_e(dec);
+                self.registers.get_flg().set_flg_sub(true);
+                self.registers
+                    .get_flg()
+                    .set_flg_half_carry((value & 0xF) == 0);
+                self.registers.get_flg().set_flg_zero(dec == 0);
+                1
             }
             0x1E => {
                 // "LD E,n"
@@ -295,6 +418,39 @@ impl CPU {
                 self.inc_hl();
                 2
             }
+            0x23 => {
+                // "INC HL"
+                let value = self.registers.get_hl();
+                self.debug_instr(format!("INC HL (0x{:02x})", value));
+                self.registers.set_hl(value.wrapping_add(1));
+                2
+            }
+            0x24 => {
+                // "INC H"
+                let value = self.registers.get_h();
+                self.debug_instr(format!("INC H (0x{:02x})", value));
+                let inc = value.wrapping_add(1);
+                self.registers.set_h(inc);
+                self.registers.get_flg().set_flg_sub(false);
+                self.registers
+                    .get_flg()
+                    .set_flg_half_carry(((value & 0xF) + 1) > 0xF);
+                self.registers.get_flg().set_flg_zero(inc == 0);
+                1
+            }
+            0x25 => {
+                // "DEC H"
+                let value = self.registers.get_h();
+                let dec = value.wrapping_sub(1);
+                self.debug_instr(format!("DEC H (0x{:02x})", value));
+                self.registers.set_h(dec);
+                self.registers.get_flg().set_flg_sub(true);
+                self.registers
+                    .get_flg()
+                    .set_flg_half_carry((value & 0xF) == 0);
+                self.registers.get_flg().set_flg_zero(dec == 0);
+                1
+            }
             0x26 => {
                 // "LD H,n"
                 let value = self.nextb();
@@ -313,6 +469,32 @@ impl CPU {
                 self.registers.set_a(value);
                 self.inc_hl();
                 2
+            }
+            0x2C => {
+                // "INC L"
+                let value = self.registers.get_l();
+                self.debug_instr(format!("INC H (0x{:02x})", value));
+                let inc = value.wrapping_add(1);
+                self.registers.set_l(inc);
+                self.registers.get_flg().set_flg_sub(false);
+                self.registers
+                    .get_flg()
+                    .set_flg_half_carry(((value & 0xF) + 1) > 0xF);
+                self.registers.get_flg().set_flg_zero(inc == 0);
+                1
+            }
+            0x2D => {
+                // "DEC L"
+                let value = self.registers.get_l();
+                let dec = value.wrapping_sub(1);
+                self.debug_instr(format!("DEC L (0x{:02x})", value));
+                self.registers.set_l(dec);
+                self.registers.get_flg().set_flg_sub(true);
+                self.registers
+                    .get_flg()
+                    .set_flg_half_carry((value & 0xF) == 0);
+                self.registers.get_flg().set_flg_zero(dec == 0);
+                1
             }
             0x2E => {
                 // "LD L,n"
@@ -338,6 +520,41 @@ impl CPU {
                 self.dec_hl();
                 2
             }
+            0x33 => {
+                // "INC SP"
+                let value = self.registers.get_sp();
+                self.debug_instr(format!("INC SP (0x{:02x})", value));
+                self.registers.set_sp(value.wrapping_add(1));
+                2
+            }
+            0x34 => {
+                // "INC (HL)"
+                let hl = self.registers.get_hl();
+                let value = self.mmu.rb(hl);
+                self.debug_instr(format!("INC (HL) (0x{:02x}) at address {:02x}", value, hl));
+                let inc = value.wrapping_add(1);
+                self.mmu.wb(hl, inc);
+                self.registers.get_flg().set_flg_sub(false);
+                self.registers
+                    .get_flg()
+                    .set_flg_half_carry(((value & 0xF) + 1) > 0xF);
+                self.registers.get_flg().set_flg_zero(inc == 0);
+                1
+            }
+            0x35 => {
+                // "DEC (HL)"
+                let hl = self.registers.get_hl();
+                let value = self.mmu.rb(hl);
+                self.debug_instr(format!("DEC (HL) (0x{:02x}) at address {:02x}", value, hl));
+                let dec = value.wrapping_sub(1);
+                self.mmu.wb(hl, dec);
+                self.registers.get_flg().set_flg_sub(true);
+                self.registers
+                    .get_flg()
+                    .set_flg_half_carry((value & 0xF) == 0);
+                self.registers.get_flg().set_flg_zero(dec == 0);
+                1
+            }
             0x36 => {
                 // LD (HL), n
                 let next_byte = self.nextb();
@@ -352,6 +569,32 @@ impl CPU {
                 self.registers.set_a(self.mmu.rb(hl));
                 self.dec_hl();
                 2
+            }
+            0x3C => {
+                // "INC A"
+                let value = self.registers.get_a();
+                self.debug_instr(format!("INC A (0x{:02x})", value));
+                let inc = value.wrapping_add(1);
+                self.registers.set_a(inc);
+                self.registers.get_flg().set_flg_sub(false);
+                self.registers
+                    .get_flg()
+                    .set_flg_half_carry(((value & 0xF) + 1) > 0xF);
+                self.registers.get_flg().set_flg_zero(inc == 0);
+                1
+            }
+            0x3D => {
+                // "DEC A"
+                let value = self.registers.get_a();
+                let dec = value.wrapping_sub(1);
+                self.debug_instr(format!("DEC A (0x{:02x})", value));
+                self.registers.set_a(dec);
+                self.registers.get_flg().set_flg_sub(true);
+                self.registers
+                    .get_flg()
+                    .set_flg_half_carry((value & 0xF) == 0);
+                self.registers.get_flg().set_flg_zero(dec == 0);
+                1
             }
             0x3E => {
                 // "LD A,n"
