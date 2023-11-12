@@ -115,19 +115,13 @@ impl CPU {
         set_zero: bool,
     ) -> u16 {
         let result = a.wrapping_add(n);
-        // Set flags
+        let flags = self.registers.get_flags();
         if set_zero && result == 0 {
-            self.registers.get_flg().set_flg_zero(result == 0);
+            flags.set_zero(result == 0);
         }
-        self.registers.get_flg().set_flg_sub(false);
-
-        self.registers.get_flg().set_flg_half_carry(
-            ((a & half_carry) as u32 + (n & half_carry) as u32) > half_carry as u32,
-        );
-
-        self.registers
-            .get_flg()
-            .set_flg_carry(((a & carry) as u32 + (n & carry) as u32) > carry as u32);
+        flags.set_sub(false);
+        flags.set_hcarry(((a & half_carry) as u32 + (n & half_carry) as u32) > half_carry as u32);
+        flags.set_carry(((a & carry) as u32 + (n & carry) as u32) > carry as u32);
 
         result
     }
@@ -147,16 +141,16 @@ impl CPU {
         let result = a.wrapping_add(n);
         // Set flags
         if set_zero && result == 0 {
-            self.registers.get_flg().set_flg_zero(result == 0);
+            self.registers.get_flags().set_zero(result == 0);
         }
-        self.registers.get_flg().set_flg_sub(false);
-        self.registers.get_flg().set_flg_half_carry(
-            ((a & half_carry) as u16 + (n & half_carry) as u16) > half_carry as u16,
-        );
+        self.registers.get_flags().set_sub(false);
+        self.registers
+            .get_flags()
+            .set_hcarry(((a & half_carry) as u16 + (n & half_carry) as u16) > half_carry as u16);
 
         self.registers
-            .get_flg()
-            .set_flg_carry(((a & carry) as u16 + (n & carry) as u16) > carry as u16);
+            .get_flags()
+            .set_carry(((a & carry) as u16 + (n & carry) as u16) > carry as u16);
 
         result
     }
@@ -178,15 +172,15 @@ impl CPU {
         let result = a.wrapping_add(n).wrapping_add(c);
         // Set flags
         if set_zero && result == 0 {
-            self.registers.get_flg().set_flg_zero(result == 0);
+            self.registers.get_flags().set_zero(result == 0);
         }
-        self.registers.get_flg().set_flg_sub(false);
-        self.registers.get_flg().set_flg_half_carry(
+        self.registers.get_flags().set_sub(false);
+        self.registers.get_flags().set_hcarry(
             ((a & half_carry_mask) as u16 + (n & half_carry_mask) as u16 + c as u16)
                 > half_carry_mask as u16,
         );
 
-        self.registers.get_flg().set_flg_carry(
+        self.registers.get_flags().set_carry(
             ((a & carry_mask) as u16 + (n & carry_mask) as u16 + c as u16) > carry_mask as u16,
         );
 
@@ -234,11 +228,10 @@ impl CPU {
                 self.debug_instr(format!("INC B (0x{:02x})", value));
                 let inc = value.wrapping_add(1);
                 self.registers.set_b(inc);
-                self.registers.get_flg().set_flg_sub(false);
-                self.registers
-                    .get_flg()
-                    .set_flg_half_carry(((value & 0xF) + 1) > 0xF);
-                self.registers.get_flg().set_flg_zero(inc == 0);
+                let flags = self.registers.get_flags();
+                flags.set_sub(false);
+                flags.set_hcarry(((value & 0xF) + 1) > 0xF);
+                flags.set_zero(inc == 0);
                 1
             }
             0x05 => {
@@ -247,11 +240,10 @@ impl CPU {
                 let dec = value.wrapping_sub(1);
                 self.debug_instr(format!("DEC B (0x{:02x})", value));
                 self.registers.set_b(dec);
-                self.registers.get_flg().set_flg_sub(true);
-                self.registers
-                    .get_flg()
-                    .set_flg_half_carry((value & 0xF) == 0);
-                self.registers.get_flg().set_flg_zero(dec == 0);
+                let flags = self.registers.get_flags();
+                flags.set_sub(true);
+                flags.set_hcarry((value & 0xF) == 0);
+                flags.set_zero(dec == 0);
                 1
             }
             0x06 => {
@@ -274,11 +266,11 @@ impl CPU {
                 self.debug_instr(format!("INC C (0x{:02x})", value));
                 let inc = value.wrapping_add(1);
                 self.registers.set_c(inc);
-                self.registers.get_flg().set_flg_sub(false);
+                self.registers.get_flags().set_sub(false);
                 self.registers
-                    .get_flg()
-                    .set_flg_half_carry(((value & 0xF) + 1) > 0xF);
-                self.registers.get_flg().set_flg_zero(inc == 0);
+                    .get_flags()
+                    .set_hcarry(((value & 0xF) + 1) > 0xF);
+                self.registers.get_flags().set_zero(inc == 0);
                 1
             }
             0x0D => {
@@ -287,11 +279,9 @@ impl CPU {
                 let dec = value.wrapping_sub(1);
                 self.debug_instr(format!("DEC C (0x{:02x})", value));
                 self.registers.set_c(dec);
-                self.registers.get_flg().set_flg_sub(true);
-                self.registers
-                    .get_flg()
-                    .set_flg_half_carry((value & 0xF) == 0);
-                self.registers.get_flg().set_flg_zero(dec == 0);
+                self.registers.get_flags().set_sub(true);
+                self.registers.get_flags().set_hcarry((value & 0xF) == 0);
+                self.registers.get_flags().set_zero(dec == 0);
                 1
             }
             0x0E => {
@@ -331,11 +321,11 @@ impl CPU {
                 self.debug_instr(format!("INC D (0x{:02x})", value));
                 let inc = value.wrapping_add(1);
                 self.registers.set_d(inc);
-                self.registers.get_flg().set_flg_sub(false);
+                self.registers.get_flags().set_sub(false);
                 self.registers
-                    .get_flg()
-                    .set_flg_half_carry(((value & 0xF) + 1) > 0xF);
-                self.registers.get_flg().set_flg_zero(inc == 0);
+                    .get_flags()
+                    .set_hcarry(((value & 0xF) + 1) > 0xF);
+                self.registers.get_flags().set_zero(inc == 0);
                 1
             }
             0x15 => {
@@ -344,11 +334,9 @@ impl CPU {
                 let dec = value.wrapping_sub(1);
                 self.debug_instr(format!("DEC D (0x{:02x})", value));
                 self.registers.set_d(dec);
-                self.registers.get_flg().set_flg_sub(true);
-                self.registers
-                    .get_flg()
-                    .set_flg_half_carry((value & 0xF) == 0);
-                self.registers.get_flg().set_flg_zero(dec == 0);
+                self.registers.get_flags().set_sub(true);
+                self.registers.get_flags().set_hcarry((value & 0xF) == 0);
+                self.registers.get_flags().set_zero(dec == 0);
                 1
             }
             0x16 => {
@@ -372,11 +360,11 @@ impl CPU {
                 self.debug_instr(format!("INC E (0x{:02x})", value));
                 let inc = value.wrapping_add(1);
                 self.registers.set_e(inc);
-                self.registers.get_flg().set_flg_sub(false);
+                self.registers.get_flags().set_sub(false);
                 self.registers
-                    .get_flg()
-                    .set_flg_half_carry(((value & 0xF) + 1) > 0xF);
-                self.registers.get_flg().set_flg_zero(inc == 0);
+                    .get_flags()
+                    .set_hcarry(((value & 0xF) + 1) > 0xF);
+                self.registers.get_flags().set_zero(inc == 0);
                 1
             }
             0x1D => {
@@ -385,11 +373,9 @@ impl CPU {
                 let dec = value.wrapping_sub(1);
                 self.debug_instr(format!("DEC E (0x{:02x})", value));
                 self.registers.set_e(dec);
-                self.registers.get_flg().set_flg_sub(true);
-                self.registers
-                    .get_flg()
-                    .set_flg_half_carry((value & 0xF) == 0);
-                self.registers.get_flg().set_flg_zero(dec == 0);
+                self.registers.get_flags().set_sub(true);
+                self.registers.get_flags().set_hcarry((value & 0xF) == 0);
+                self.registers.get_flags().set_zero(dec == 0);
                 1
             }
             0x1E => {
@@ -431,11 +417,11 @@ impl CPU {
                 self.debug_instr(format!("INC H (0x{:02x})", value));
                 let inc = value.wrapping_add(1);
                 self.registers.set_h(inc);
-                self.registers.get_flg().set_flg_sub(false);
+                self.registers.get_flags().set_sub(false);
                 self.registers
-                    .get_flg()
-                    .set_flg_half_carry(((value & 0xF) + 1) > 0xF);
-                self.registers.get_flg().set_flg_zero(inc == 0);
+                    .get_flags()
+                    .set_hcarry(((value & 0xF) + 1) > 0xF);
+                self.registers.get_flags().set_zero(inc == 0);
                 1
             }
             0x25 => {
@@ -444,11 +430,9 @@ impl CPU {
                 let dec = value.wrapping_sub(1);
                 self.debug_instr(format!("DEC H (0x{:02x})", value));
                 self.registers.set_h(dec);
-                self.registers.get_flg().set_flg_sub(true);
-                self.registers
-                    .get_flg()
-                    .set_flg_half_carry((value & 0xF) == 0);
-                self.registers.get_flg().set_flg_zero(dec == 0);
+                self.registers.get_flags().set_sub(true);
+                self.registers.get_flags().set_hcarry((value & 0xF) == 0);
+                self.registers.get_flags().set_zero(dec == 0);
                 1
             }
             0x26 => {
@@ -476,11 +460,11 @@ impl CPU {
                 self.debug_instr(format!("INC H (0x{:02x})", value));
                 let inc = value.wrapping_add(1);
                 self.registers.set_l(inc);
-                self.registers.get_flg().set_flg_sub(false);
+                self.registers.get_flags().set_sub(false);
                 self.registers
-                    .get_flg()
-                    .set_flg_half_carry(((value & 0xF) + 1) > 0xF);
-                self.registers.get_flg().set_flg_zero(inc == 0);
+                    .get_flags()
+                    .set_hcarry(((value & 0xF) + 1) > 0xF);
+                self.registers.get_flags().set_zero(inc == 0);
                 1
             }
             0x2D => {
@@ -489,11 +473,9 @@ impl CPU {
                 let dec = value.wrapping_sub(1);
                 self.debug_instr(format!("DEC L (0x{:02x})", value));
                 self.registers.set_l(dec);
-                self.registers.get_flg().set_flg_sub(true);
-                self.registers
-                    .get_flg()
-                    .set_flg_half_carry((value & 0xF) == 0);
-                self.registers.get_flg().set_flg_zero(dec == 0);
+                self.registers.get_flags().set_sub(true);
+                self.registers.get_flags().set_hcarry((value & 0xF) == 0);
+                self.registers.get_flags().set_zero(dec == 0);
                 1
             }
             0x2E => {
@@ -534,11 +516,11 @@ impl CPU {
                 self.debug_instr(format!("INC (HL) (0x{:02x}) at address {:02x}", value, hl));
                 let inc = value.wrapping_add(1);
                 self.mmu.wb(hl, inc);
-                self.registers.get_flg().set_flg_sub(false);
+                self.registers.get_flags().set_sub(false);
                 self.registers
-                    .get_flg()
-                    .set_flg_half_carry(((value & 0xF) + 1) > 0xF);
-                self.registers.get_flg().set_flg_zero(inc == 0);
+                    .get_flags()
+                    .set_hcarry(((value & 0xF) + 1) > 0xF);
+                self.registers.get_flags().set_zero(inc == 0);
                 1
             }
             0x35 => {
@@ -548,11 +530,9 @@ impl CPU {
                 self.debug_instr(format!("DEC (HL) (0x{:02x}) at address {:02x}", value, hl));
                 let dec = value.wrapping_sub(1);
                 self.mmu.wb(hl, dec);
-                self.registers.get_flg().set_flg_sub(true);
-                self.registers
-                    .get_flg()
-                    .set_flg_half_carry((value & 0xF) == 0);
-                self.registers.get_flg().set_flg_zero(dec == 0);
+                self.registers.get_flags().set_sub(true);
+                self.registers.get_flags().set_hcarry((value & 0xF) == 0);
+                self.registers.get_flags().set_zero(dec == 0);
                 1
             }
             0x36 => {
@@ -576,11 +556,11 @@ impl CPU {
                 self.debug_instr(format!("INC A (0x{:02x})", value));
                 let inc = value.wrapping_add(1);
                 self.registers.set_a(inc);
-                self.registers.get_flg().set_flg_sub(false);
+                self.registers.get_flags().set_sub(false);
                 self.registers
-                    .get_flg()
-                    .set_flg_half_carry(((value & 0xF) + 1) > 0xF);
-                self.registers.get_flg().set_flg_zero(inc == 0);
+                    .get_flags()
+                    .set_hcarry(((value & 0xF) + 1) > 0xF);
+                self.registers.get_flags().set_zero(inc == 0);
                 1
             }
             0x3D => {
@@ -589,11 +569,9 @@ impl CPU {
                 let dec = value.wrapping_sub(1);
                 self.debug_instr(format!("DEC A (0x{:02x})", value));
                 self.registers.set_a(dec);
-                self.registers.get_flg().set_flg_sub(true);
-                self.registers
-                    .get_flg()
-                    .set_flg_half_carry((value & 0xF) == 0);
-                self.registers.get_flg().set_flg_zero(dec == 0);
+                self.registers.get_flags().set_sub(true);
+                self.registers.get_flags().set_hcarry((value & 0xF) == 0);
+                self.registers.get_flags().set_zero(dec == 0);
                 1
             }
             0x3E => {
@@ -1077,7 +1055,7 @@ impl CPU {
             }
             0x88 => {
                 // "ADC A,B"
-                let carry = self.registers.get_flg().get_flg_carry();
+                let carry = self.registers.get_flags().get_carry();
                 self.debug_instr(format!(
                     "ADC (A, B={:02x}) - Carry flag: {}",
                     self.registers.get_b(),
@@ -1092,7 +1070,7 @@ impl CPU {
             }
             0x89 => {
                 // "ADC A,C"
-                let carry = self.registers.get_flg().get_flg_carry();
+                let carry = self.registers.get_flags().get_carry();
                 self.debug_instr(format!(
                     "ADC (A, C={:02x}) - Carry flag: {}",
                     self.registers.get_c(),
@@ -1107,7 +1085,7 @@ impl CPU {
             }
             0x8A => {
                 // "ADC A,D"
-                let carry = self.registers.get_flg().get_flg_carry();
+                let carry = self.registers.get_flags().get_carry();
                 self.debug_instr(format!(
                     "ADC (A, D={:02x}) - Carry flag: {}",
                     self.registers.get_d(),
@@ -1122,7 +1100,7 @@ impl CPU {
             }
             0x8B => {
                 // "ADC A,E"
-                let carry = self.registers.get_flg().get_flg_carry();
+                let carry = self.registers.get_flags().get_carry();
                 self.debug_instr(format!(
                     "ADC (A, E={:02x}) - Carry flag: {}",
                     self.registers.get_e(),
@@ -1137,7 +1115,7 @@ impl CPU {
             }
             0x8C => {
                 // "ADC A,H"
-                let carry = self.registers.get_flg().get_flg_carry();
+                let carry = self.registers.get_flags().get_carry();
                 self.debug_instr(format!(
                     "ADC (A, H={:02x}) - Carry flag: {}",
                     self.registers.get_h(),
@@ -1152,7 +1130,7 @@ impl CPU {
             }
             0x8D => {
                 // "ADC A,L"
-                let carry = self.registers.get_flg().get_flg_carry();
+                let carry = self.registers.get_flags().get_carry();
                 self.debug_instr(format!(
                     "ADC (A, L={:02x}) - Carry flag: {}",
                     self.registers.get_l(),
@@ -1167,7 +1145,7 @@ impl CPU {
             }
             0x8E => {
                 // "ADC A,(HL)"
-                let carry = self.registers.get_flg().get_flg_carry();
+                let carry = self.registers.get_flags().get_carry();
                 let hl = self.registers.get_hl();
                 let content = self.mmu.rb(hl);
                 self.debug_instr(format!(
@@ -1181,7 +1159,7 @@ impl CPU {
             0x8F => {
                 // "ADC A,A"
                 let value = self.registers.get_a();
-                let carry = self.registers.get_flg().get_flg_carry();
+                let carry = self.registers.get_flags().get_carry();
                 self.debug_instr(format!("ADC (A, A={:02x}) - Carry flag: {}", value, carry));
                 let result = self.alu8_adc(value, value, carry, true);
                 self.registers.set_a(result);
@@ -1202,7 +1180,7 @@ impl CPU {
             0xCE => {
                 // "ADC A,n"
                 let value = self.nextb();
-                let carry = self.registers.get_flg().get_flg_carry();
+                let carry = self.registers.get_flags().get_carry();
                 self.debug_instr(format!("ADD (A, n={:02x}) - Carry flag {}", value, carry));
                 let result = self.alu8_adc(self.registers.get_a(), value, carry, true);
                 self.registers.set_a(result);
@@ -1263,7 +1241,7 @@ impl CPU {
                 let n = self.nextb() as u8 as i8;
                 let sp = self.registers.get_sp();
                 self.debug_instr(format!("LDHL HL <- SP (0x{:04x}) + n (0x{:02x})", sp, n));
-                self.registers.get_flg().set_flg_zero(false); // The previous alu call will not reset zero
+                self.registers.get_flags().set_zero(false); // The previous alu call will not reset zero
                 let result = self.alu16_add_with_carry(sp, n as u16, 0xFF, 0xF, false);
                 self.registers.set_hl(result);
                 3

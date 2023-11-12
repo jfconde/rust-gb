@@ -67,7 +67,7 @@ impl CPURegisters {
     pub fn get_pc(&self) -> u16 {
         self.pc
     }
-    pub fn get_flg(&mut self) -> &mut CPUFlags {
+    pub fn get_flags(&mut self) -> &mut CPUFlags {
         &mut self.flg
     }
     pub fn set_a(&mut self, value: u8) {
@@ -162,11 +162,11 @@ impl CPUFlags {
         self.value
     }
 
-    pub fn get_flg_zero(&self) -> bool {
+    pub fn get_zero(&self) -> bool {
         (self.value & FLG_ZERO) > 0
     }
 
-    pub fn set_flg_zero(&mut self, value: bool) -> u8 {
+    pub fn set_zero(&mut self, value: bool) -> u8 {
         if value {
             self.value = self.value | FLG_ZERO;
         } else {
@@ -175,11 +175,11 @@ impl CPUFlags {
         self.value
     }
 
-    pub fn get_flg_sub(&self) -> bool {
+    pub fn get_sub(&self) -> bool {
         (self.value & FLG_SUB) > 0
     }
 
-    pub fn set_flg_sub(&mut self, value: bool) -> u8 {
+    pub fn set_sub(&mut self, value: bool) -> u8 {
         if value {
             self.value = self.value | FLG_SUB;
         } else {
@@ -188,11 +188,11 @@ impl CPUFlags {
         self.value
     }
 
-    pub fn get_flg_half_carry(&self) -> bool {
+    pub fn get_hcarry(&self) -> bool {
         (self.value & FLG_HCARRY) > 0
     }
 
-    pub fn set_flg_half_carry(&mut self, value: bool) -> u8 {
+    pub fn set_hcarry(&mut self, value: bool) -> u8 {
         if value {
             self.value = self.value | FLG_HCARRY;
         } else {
@@ -201,11 +201,11 @@ impl CPUFlags {
         self.value
     }
 
-    pub fn get_flg_carry(&self) -> bool {
+    pub fn get_carry(&self) -> bool {
         (self.value & FLG_CARRY) > 0
     }
 
-    pub fn set_flg_carry(&mut self, value: bool) -> u8 {
+    pub fn set_carry(&mut self, value: bool) -> u8 {
         if value {
             self.value = self.value | FLG_CARRY;
         } else {

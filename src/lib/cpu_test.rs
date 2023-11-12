@@ -59,71 +59,71 @@ fn test_cpu_opcode_0x02() {
 fn test_cpu_opcode_0x03() {
     let mut cpu = cpu_from_data(&mut vec![0x03, 0x03, 0x03]);
     cpu.registers.set_bc(0xFFFD);
-    cpu.registers.get_flg().set_flg_carry(false);
-    cpu.registers.get_flg().set_flg_half_carry(false);
+    cpu.registers.get_flags().set_carry(false);
+    cpu.registers.get_flags().set_hcarry(false);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_bc(), 0xFFFE);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
     assert_eq!(nops, 2);
     cpu.exec_inst();
     assert_eq!(cpu.registers.get_bc(), 0xFFFF);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
     cpu.exec_inst();
     assert_eq!(cpu.registers.get_bc(), 0);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
 }
 
 #[test]
 fn test_cpu_opcode_0x04() {
     let mut cpu = cpu_from_data(&mut vec![0x04, 0x04, 0x04]);
     cpu.registers.set_b(0x0E);
-    cpu.registers.get_flg().set_flg_carry(false);
-    cpu.registers.get_flg().set_flg_half_carry(false);
-    cpu.registers.get_flg().set_flg_zero(false);
+    cpu.registers.get_flags().set_carry(false);
+    cpu.registers.get_flags().set_hcarry(false);
+    cpu.registers.get_flags().set_zero(false);
 
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_b(), 0x0F);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
     assert_eq!(nops, 1);
     cpu.exec_inst();
     assert_eq!(cpu.registers.get_b(), 0x10);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    cpu.registers.get_flg().set_flg_half_carry(false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    cpu.registers.get_flags().set_hcarry(false);
     cpu.registers.set_b(0xFF);
     cpu.exec_inst();
     assert_eq!(cpu.registers.get_b(), 0x00);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), true);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
+    assert_eq!(cpu.registers.get_flags().get_zero(), true);
 }
 
 #[test]
 fn test_cpu_opcode_0x05() {
     let mut cpu = cpu_from_data(&mut vec![0x05, 0x05, 0x05]);
     cpu.registers.set_b(0x01);
-    cpu.registers.get_flg().set_value(0);
+    cpu.registers.get_flags().set_value(0);
 
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_b(), 0x00);
-    assert_eq!(cpu.registers.get_flg().get_value(), FLG_ZERO | FLG_SUB);
+    assert_eq!(cpu.registers.get_flags().get_value(), FLG_ZERO | FLG_SUB);
     assert_eq!(nops, 1);
-    cpu.registers.get_flg().set_flg_half_carry(false);
-    cpu.registers.get_flg().set_value(0);
+    cpu.registers.get_flags().set_hcarry(false);
+    cpu.registers.get_flags().set_value(0);
     cpu.exec_inst();
     assert_eq!(cpu.registers.get_b(), 0xFF);
-    assert_eq!(cpu.registers.get_flg().get_value(), FLG_HCARRY | FLG_SUB);
+    assert_eq!(cpu.registers.get_flags().get_value(), FLG_HCARRY | FLG_SUB);
     cpu.registers.set_b(0x20);
-    cpu.registers.get_flg().set_value(0);
+    cpu.registers.get_flags().set_value(0);
     cpu.exec_inst();
     assert_eq!(cpu.registers.get_b(), 0x1F);
-    assert_eq!(cpu.registers.get_flg().get_value(), FLG_HCARRY | FLG_SUB);
+    assert_eq!(cpu.registers.get_flags().get_value(), FLG_HCARRY | FLG_SUB);
 }
 
 #[test]
@@ -155,50 +155,50 @@ fn test_cpu_opcode_0x0a() {
 fn test_cpu_opcode_0x0c() {
     let mut cpu = cpu_from_data(&mut vec![0x0c, 0x0c, 0x0c]);
     cpu.registers.set_c(0x0E);
-    cpu.registers.get_flg().set_flg_carry(false);
-    cpu.registers.get_flg().set_flg_half_carry(false);
-    cpu.registers.get_flg().set_flg_zero(false);
+    cpu.registers.get_flags().set_carry(false);
+    cpu.registers.get_flags().set_hcarry(false);
+    cpu.registers.get_flags().set_zero(false);
 
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_c(), 0x0F);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
     assert_eq!(nops, 1);
     cpu.exec_inst();
     assert_eq!(cpu.registers.get_c(), 0x10);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    cpu.registers.get_flg().set_flg_half_carry(false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    cpu.registers.get_flags().set_hcarry(false);
     cpu.registers.set_c(0xFF);
     cpu.exec_inst();
     assert_eq!(cpu.registers.get_c(), 0x00);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), true);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
+    assert_eq!(cpu.registers.get_flags().get_zero(), true);
 }
 
 #[test]
 fn test_cpu_opcode_0x0d() {
     let mut cpu = cpu_from_data(&mut vec![0x0d, 0x0d, 0x0d]);
     cpu.registers.set_c(0x01);
-    cpu.registers.get_flg().set_value(0);
+    cpu.registers.get_flags().set_value(0);
 
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_c(), 0x00);
-    assert_eq!(cpu.registers.get_flg().get_value(), FLG_ZERO | FLG_SUB);
+    assert_eq!(cpu.registers.get_flags().get_value(), FLG_ZERO | FLG_SUB);
     assert_eq!(nops, 1);
-    cpu.registers.get_flg().set_flg_half_carry(false);
-    cpu.registers.get_flg().set_value(0);
+    cpu.registers.get_flags().set_hcarry(false);
+    cpu.registers.get_flags().set_value(0);
     cpu.exec_inst();
     assert_eq!(cpu.registers.get_c(), 0xFF);
-    assert_eq!(cpu.registers.get_flg().get_value(), FLG_HCARRY | FLG_SUB);
+    assert_eq!(cpu.registers.get_flags().get_value(), FLG_HCARRY | FLG_SUB);
     cpu.registers.set_c(0x20);
-    cpu.registers.get_flg().set_value(0);
+    cpu.registers.get_flags().set_value(0);
     cpu.exec_inst();
     assert_eq!(cpu.registers.get_c(), 0x1F);
-    assert_eq!(cpu.registers.get_flg().get_value(), FLG_HCARRY | FLG_SUB);
+    assert_eq!(cpu.registers.get_flags().get_value(), FLG_HCARRY | FLG_SUB);
 }
 
 #[test]
@@ -240,71 +240,71 @@ fn test_cpu_opcode_0x12() {
 fn test_cpu_opcode_0x13() {
     let mut cpu = cpu_from_data(&mut vec![0x13, 0x13, 0x13]);
     cpu.registers.set_de(0xFFFD);
-    cpu.registers.get_flg().set_flg_carry(false);
-    cpu.registers.get_flg().set_flg_half_carry(false);
+    cpu.registers.get_flags().set_carry(false);
+    cpu.registers.get_flags().set_hcarry(false);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_de(), 0xFFFE);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
     assert_eq!(nops, 2);
     cpu.exec_inst();
     assert_eq!(cpu.registers.get_de(), 0xFFFF);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
     cpu.exec_inst();
     assert_eq!(cpu.registers.get_de(), 0);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
 }
 
 #[test]
 fn test_cpu_opcode_0x14() {
     let mut cpu = cpu_from_data(&mut vec![0x14, 0x14, 0x14]);
     cpu.registers.set_d(0x0E);
-    cpu.registers.get_flg().set_flg_carry(false);
-    cpu.registers.get_flg().set_flg_half_carry(false);
-    cpu.registers.get_flg().set_flg_zero(false);
+    cpu.registers.get_flags().set_carry(false);
+    cpu.registers.get_flags().set_hcarry(false);
+    cpu.registers.get_flags().set_zero(false);
 
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_d(), 0x0F);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
     assert_eq!(nops, 1);
     cpu.exec_inst();
     assert_eq!(cpu.registers.get_d(), 0x10);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    cpu.registers.get_flg().set_flg_half_carry(false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    cpu.registers.get_flags().set_hcarry(false);
     cpu.registers.set_d(0xFF);
     cpu.exec_inst();
     assert_eq!(cpu.registers.get_d(), 0x00);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), true);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
+    assert_eq!(cpu.registers.get_flags().get_zero(), true);
 }
 
 #[test]
 fn test_cpu_opcode_0x15() {
     let mut cpu = cpu_from_data(&mut vec![0x15, 0x15, 0x15]);
     cpu.registers.set_d(0x01);
-    cpu.registers.get_flg().set_value(0);
+    cpu.registers.get_flags().set_value(0);
 
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_d(), 0x00);
-    assert_eq!(cpu.registers.get_flg().get_value(), FLG_ZERO | FLG_SUB);
+    assert_eq!(cpu.registers.get_flags().get_value(), FLG_ZERO | FLG_SUB);
     assert_eq!(nops, 1);
-    cpu.registers.get_flg().set_flg_half_carry(false);
-    cpu.registers.get_flg().set_value(0);
+    cpu.registers.get_flags().set_hcarry(false);
+    cpu.registers.get_flags().set_value(0);
     cpu.exec_inst();
     assert_eq!(cpu.registers.get_d(), 0xFF);
-    assert_eq!(cpu.registers.get_flg().get_value(), FLG_HCARRY | FLG_SUB);
+    assert_eq!(cpu.registers.get_flags().get_value(), FLG_HCARRY | FLG_SUB);
     cpu.registers.set_d(0x20);
-    cpu.registers.get_flg().set_value(0);
+    cpu.registers.get_flags().set_value(0);
     cpu.exec_inst();
     assert_eq!(cpu.registers.get_d(), 0x1F);
-    assert_eq!(cpu.registers.get_flg().get_value(), FLG_HCARRY | FLG_SUB);
+    assert_eq!(cpu.registers.get_flags().get_value(), FLG_HCARRY | FLG_SUB);
 }
 
 #[test]
@@ -336,50 +336,50 @@ fn test_cpu_opcode_0x1a() {
 fn test_cpu_opcode_0x1c() {
     let mut cpu = cpu_from_data(&mut vec![0x1c, 0x1c, 0x1c]);
     cpu.registers.set_e(0x0E);
-    cpu.registers.get_flg().set_flg_carry(false);
-    cpu.registers.get_flg().set_flg_half_carry(false);
-    cpu.registers.get_flg().set_flg_zero(false);
+    cpu.registers.get_flags().set_carry(false);
+    cpu.registers.get_flags().set_hcarry(false);
+    cpu.registers.get_flags().set_zero(false);
 
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_e(), 0x0F);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
     assert_eq!(nops, 1);
     cpu.exec_inst();
     assert_eq!(cpu.registers.get_e(), 0x10);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    cpu.registers.get_flg().set_flg_half_carry(false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    cpu.registers.get_flags().set_hcarry(false);
     cpu.registers.set_e(0xFF);
     cpu.exec_inst();
     assert_eq!(cpu.registers.get_e(), 0x00);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), true);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
+    assert_eq!(cpu.registers.get_flags().get_zero(), true);
 }
 
 #[test]
 fn test_cpu_opcode_0x1d() {
     let mut cpu = cpu_from_data(&mut vec![0x1d, 0x1d, 0x1d]);
     cpu.registers.set_e(0x01);
-    cpu.registers.get_flg().set_value(0);
+    cpu.registers.get_flags().set_value(0);
 
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_e(), 0x00);
-    assert_eq!(cpu.registers.get_flg().get_value(), FLG_ZERO | FLG_SUB);
+    assert_eq!(cpu.registers.get_flags().get_value(), FLG_ZERO | FLG_SUB);
     assert_eq!(nops, 1);
-    cpu.registers.get_flg().set_flg_half_carry(false);
-    cpu.registers.get_flg().set_value(0);
+    cpu.registers.get_flags().set_hcarry(false);
+    cpu.registers.get_flags().set_value(0);
     cpu.exec_inst();
     assert_eq!(cpu.registers.get_e(), 0xFF);
-    assert_eq!(cpu.registers.get_flg().get_value(), FLG_HCARRY | FLG_SUB);
+    assert_eq!(cpu.registers.get_flags().get_value(), FLG_HCARRY | FLG_SUB);
     cpu.registers.set_e(0x20);
-    cpu.registers.get_flg().set_value(0);
+    cpu.registers.get_flags().set_value(0);
     cpu.exec_inst();
     assert_eq!(cpu.registers.get_e(), 0x1F);
-    assert_eq!(cpu.registers.get_flg().get_value(), FLG_HCARRY | FLG_SUB);
+    assert_eq!(cpu.registers.get_flags().get_value(), FLG_HCARRY | FLG_SUB);
 }
 
 #[test]
@@ -421,71 +421,71 @@ fn test_cpu_opcode_0x22() {
 fn test_cpu_opcode_0x23() {
     let mut cpu = cpu_from_data(&mut vec![0x23, 0x23, 0x23]);
     cpu.registers.set_hl(0xFFFD);
-    cpu.registers.get_flg().set_flg_carry(false);
-    cpu.registers.get_flg().set_flg_half_carry(false);
+    cpu.registers.get_flags().set_carry(false);
+    cpu.registers.get_flags().set_hcarry(false);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_hl(), 0xFFFE);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
     assert_eq!(nops, 2);
     cpu.exec_inst();
     assert_eq!(cpu.registers.get_hl(), 0xFFFF);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
     cpu.exec_inst();
     assert_eq!(cpu.registers.get_hl(), 0);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
 }
 
 #[test]
 fn test_cpu_opcode_0x24() {
     let mut cpu = cpu_from_data(&mut vec![0x24, 0x24, 0x24]);
     cpu.registers.set_h(0x0E);
-    cpu.registers.get_flg().set_flg_carry(false);
-    cpu.registers.get_flg().set_flg_half_carry(false);
-    cpu.registers.get_flg().set_flg_zero(false);
+    cpu.registers.get_flags().set_carry(false);
+    cpu.registers.get_flags().set_hcarry(false);
+    cpu.registers.get_flags().set_zero(false);
 
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_h(), 0x0F);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
     assert_eq!(nops, 1);
     cpu.exec_inst();
     assert_eq!(cpu.registers.get_h(), 0x10);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    cpu.registers.get_flg().set_flg_half_carry(false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    cpu.registers.get_flags().set_hcarry(false);
     cpu.registers.set_h(0xFF);
     cpu.exec_inst();
     assert_eq!(cpu.registers.get_h(), 0x00);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), true);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
+    assert_eq!(cpu.registers.get_flags().get_zero(), true);
 }
 
 #[test]
 fn test_cpu_opcode_0x25() {
     let mut cpu = cpu_from_data(&mut vec![0x25, 0x25, 0x25]);
     cpu.registers.set_h(0x01);
-    cpu.registers.get_flg().set_value(0);
+    cpu.registers.get_flags().set_value(0);
 
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_h(), 0x00);
-    assert_eq!(cpu.registers.get_flg().get_value(), FLG_ZERO | FLG_SUB);
+    assert_eq!(cpu.registers.get_flags().get_value(), FLG_ZERO | FLG_SUB);
     assert_eq!(nops, 1);
-    cpu.registers.get_flg().set_flg_half_carry(false);
-    cpu.registers.get_flg().set_value(0);
+    cpu.registers.get_flags().set_hcarry(false);
+    cpu.registers.get_flags().set_value(0);
     cpu.exec_inst();
     assert_eq!(cpu.registers.get_h(), 0xFF);
-    assert_eq!(cpu.registers.get_flg().get_value(), FLG_HCARRY | FLG_SUB);
+    assert_eq!(cpu.registers.get_flags().get_value(), FLG_HCARRY | FLG_SUB);
     cpu.registers.set_h(0x20);
-    cpu.registers.get_flg().set_value(0);
+    cpu.registers.get_flags().set_value(0);
     cpu.exec_inst();
     assert_eq!(cpu.registers.get_h(), 0x1F);
-    assert_eq!(cpu.registers.get_flg().get_value(), FLG_HCARRY | FLG_SUB);
+    assert_eq!(cpu.registers.get_flags().get_value(), FLG_HCARRY | FLG_SUB);
 }
 
 #[test]
@@ -516,43 +516,43 @@ fn test_cpu_opcode_0x2a() {
 fn test_cpu_opcode_0x2c() {
     let mut cpu = cpu_from_data(&mut vec![0x2c, 0x2c, 0x2c]);
     cpu.registers.set_l(0x0E);
-    cpu.registers.get_flg().set_value(0);
+    cpu.registers.get_flags().set_value(0);
 
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_l(), 0x0F);
-    assert_eq!(cpu.registers.get_flg().get_value(), 0);
+    assert_eq!(cpu.registers.get_flags().get_value(), 0);
     assert_eq!(nops, 1);
-    cpu.registers.get_flg().set_value(0);
+    cpu.registers.get_flags().set_value(0);
     cpu.exec_inst();
     assert_eq!(cpu.registers.get_l(), 0x10);
-    assert_eq!(cpu.registers.get_flg().get_value(), FLG_HCARRY);
+    assert_eq!(cpu.registers.get_flags().get_value(), FLG_HCARRY);
     cpu.registers.set_l(0xFF);
-    cpu.registers.get_flg().set_value(0);
+    cpu.registers.get_flags().set_value(0);
     cpu.exec_inst();
     assert_eq!(cpu.registers.get_l(), 0x00);
-    assert_eq!(cpu.registers.get_flg().get_value(), FLG_HCARRY | FLG_ZERO);
+    assert_eq!(cpu.registers.get_flags().get_value(), FLG_HCARRY | FLG_ZERO);
 }
 
 #[test]
 fn test_cpu_opcode_0x2d() {
     let mut cpu = cpu_from_data(&mut vec![0x2d, 0x2d, 0x2d]);
     cpu.registers.set_l(0x01);
-    cpu.registers.get_flg().set_value(0);
+    cpu.registers.get_flags().set_value(0);
 
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_l(), 0x00);
-    assert_eq!(cpu.registers.get_flg().get_value(), FLG_ZERO | FLG_SUB);
+    assert_eq!(cpu.registers.get_flags().get_value(), FLG_ZERO | FLG_SUB);
     assert_eq!(nops, 1);
-    cpu.registers.get_flg().set_flg_half_carry(false);
-    cpu.registers.get_flg().set_value(0);
+    cpu.registers.get_flags().set_hcarry(false);
+    cpu.registers.get_flags().set_value(0);
     cpu.exec_inst();
     assert_eq!(cpu.registers.get_l(), 0xFF);
-    assert_eq!(cpu.registers.get_flg().get_value(), FLG_HCARRY | FLG_SUB);
+    assert_eq!(cpu.registers.get_flags().get_value(), FLG_HCARRY | FLG_SUB);
     cpu.registers.set_l(0x20);
-    cpu.registers.get_flg().set_value(0);
+    cpu.registers.get_flags().set_value(0);
     cpu.exec_inst();
     assert_eq!(cpu.registers.get_l(), 0x1F);
-    assert_eq!(cpu.registers.get_flg().get_value(), FLG_HCARRY | FLG_SUB);
+    assert_eq!(cpu.registers.get_flags().get_value(), FLG_HCARRY | FLG_SUB);
 }
 
 #[test]
@@ -594,21 +594,21 @@ fn test_cpu_opcode_0x32() {
 fn test_cpu_opcode_0x33() {
     let mut cpu = cpu_from_data(&mut vec![0x33, 0x33, 0x33]);
     cpu.registers.set_sp(0xFFFD);
-    cpu.registers.get_flg().set_flg_carry(false);
-    cpu.registers.get_flg().set_flg_half_carry(false);
+    cpu.registers.get_flags().set_carry(false);
+    cpu.registers.get_flags().set_hcarry(false);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_sp(), 0xFFFE);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
     assert_eq!(nops, 2);
     cpu.exec_inst();
     assert_eq!(cpu.registers.get_sp(), 0xFFFF);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
     cpu.exec_inst();
     assert_eq!(cpu.registers.get_sp(), 0);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
 }
 
 #[test]
@@ -616,20 +616,20 @@ fn test_cpu_opcode_0x34() {
     let mut cpu = cpu_from_data(&mut vec![0x34, 0x34, 0x34]);
     cpu.mmu.wb(0xC000, 0x0E);
     cpu.registers.set_hl(0xC000);
-    cpu.registers.get_flg().set_value(0);
+    cpu.registers.get_flags().set_value(0);
 
     let nops = cpu.exec_inst();
     assert_eq!(cpu.mmu.rb(cpu.registers.get_hl()), 0x0F);
-    assert_eq!(cpu.registers.get_flg().get_value(), 0);
+    assert_eq!(cpu.registers.get_flags().get_value(), 0);
     assert_eq!(nops, 1);
     cpu.exec_inst();
     assert_eq!(cpu.mmu.rb(cpu.registers.get_hl()), 0x10);
-    assert_eq!(cpu.registers.get_flg().get_value(), FLG_HCARRY);
-    cpu.registers.get_flg().set_flg_half_carry(false);
+    assert_eq!(cpu.registers.get_flags().get_value(), FLG_HCARRY);
+    cpu.registers.get_flags().set_hcarry(false);
     cpu.mmu.wb(0xC000, 0xFF);
     cpu.exec_inst();
     assert_eq!(cpu.mmu.rb(cpu.registers.get_hl()), 0x00);
-    assert_eq!(cpu.registers.get_flg().get_value(), FLG_HCARRY | FLG_ZERO);
+    assert_eq!(cpu.registers.get_flags().get_value(), FLG_HCARRY | FLG_ZERO);
 }
 
 #[test]
@@ -637,21 +637,21 @@ fn test_cpu_opcode_0x35() {
     let mut cpu = cpu_from_data(&mut vec![0x35, 0x35, 0x35]);
     cpu.mmu.wb(0xC000, 0x11);
     cpu.registers.set_hl(0xC000);
-    cpu.registers.get_flg().set_value(0);
+    cpu.registers.get_flags().set_value(0);
 
     let nops = cpu.exec_inst();
     assert_eq!(cpu.mmu.rb(cpu.registers.get_hl()), 0x10);
-    assert_eq!(cpu.registers.get_flg().get_value(), FLG_SUB);
+    assert_eq!(cpu.registers.get_flags().get_value(), FLG_SUB);
     assert_eq!(nops, 1);
-    cpu.registers.get_flg().set_value(0);
+    cpu.registers.get_flags().set_value(0);
     cpu.exec_inst();
     assert_eq!(cpu.mmu.rb(cpu.registers.get_hl()), 0x0F);
-    assert_eq!(cpu.registers.get_flg().get_value(), FLG_SUB | FLG_HCARRY);
-    cpu.registers.get_flg().set_value(0);
+    assert_eq!(cpu.registers.get_flags().get_value(), FLG_SUB | FLG_HCARRY);
+    cpu.registers.get_flags().set_value(0);
     cpu.mmu.wb(0xC000, 0x01);
     cpu.exec_inst();
     assert_eq!(cpu.mmu.rb(cpu.registers.get_hl()), 0x00);
-    assert_eq!(cpu.registers.get_flg().get_value(), FLG_SUB | FLG_ZERO);
+    assert_eq!(cpu.registers.get_flags().get_value(), FLG_SUB | FLG_ZERO);
 }
 
 #[test]
@@ -684,44 +684,44 @@ fn test_cpu_opcode_0x3a() {
 fn test_cpu_opcode_0x3c() {
     let mut cpu = cpu_from_data(&mut vec![0x3c, 0x3c, 0x3c]);
     cpu.registers.set_a(0x0E);
-    cpu.registers.get_flg().set_value(0);
+    cpu.registers.get_flags().set_value(0);
 
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x0F);
-    assert_eq!(cpu.registers.get_flg().get_value(), 0);
+    assert_eq!(cpu.registers.get_flags().get_value(), 0);
     assert_eq!(nops, 1);
-    cpu.registers.get_flg().set_value(0);
+    cpu.registers.get_flags().set_value(0);
     cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x10);
-    assert_eq!(cpu.registers.get_flg().get_value(), FLG_HCARRY);
-    cpu.registers.get_flg().set_flg_half_carry(false);
+    assert_eq!(cpu.registers.get_flags().get_value(), FLG_HCARRY);
+    cpu.registers.get_flags().set_hcarry(false);
     cpu.registers.set_a(0xFF);
-    cpu.registers.get_flg().set_value(0);
+    cpu.registers.get_flags().set_value(0);
     cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x00);
-    assert_eq!(cpu.registers.get_flg().get_value(), FLG_HCARRY | FLG_ZERO);
+    assert_eq!(cpu.registers.get_flags().get_value(), FLG_HCARRY | FLG_ZERO);
 }
 
 #[test]
 fn test_cpu_opcode_0x3d() {
     let mut cpu = cpu_from_data(&mut vec![0x3d, 0x3d, 0x3d]);
     cpu.registers.set_a(0x01);
-    cpu.registers.get_flg().set_value(0);
+    cpu.registers.get_flags().set_value(0);
 
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x00);
-    assert_eq!(cpu.registers.get_flg().get_value(), FLG_ZERO | FLG_SUB);
+    assert_eq!(cpu.registers.get_flags().get_value(), FLG_ZERO | FLG_SUB);
     assert_eq!(nops, 1);
-    cpu.registers.get_flg().set_flg_half_carry(false);
-    cpu.registers.get_flg().set_value(0);
+    cpu.registers.get_flags().set_hcarry(false);
+    cpu.registers.get_flags().set_value(0);
     cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0xFF);
-    assert_eq!(cpu.registers.get_flg().get_value(), FLG_HCARRY | FLG_SUB);
+    assert_eq!(cpu.registers.get_flags().get_value(), FLG_HCARRY | FLG_SUB);
     cpu.registers.set_a(0x20);
-    cpu.registers.get_flg().set_value(0);
+    cpu.registers.get_flags().set_value(0);
     cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x1F);
-    assert_eq!(cpu.registers.get_flg().get_value(), FLG_HCARRY | FLG_SUB);
+    assert_eq!(cpu.registers.get_flags().get_value(), FLG_HCARRY | FLG_SUB);
 }
 
 #[test]
@@ -1453,10 +1453,10 @@ fn test_cpu_opcode_0x80() {
     cpu.registers.set_b(0x02);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x03);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x80]);
@@ -1464,10 +1464,10 @@ fn test_cpu_opcode_0x80() {
     cpu.registers.set_b(0xFF);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0xFE);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x80]);
@@ -1475,10 +1475,10 @@ fn test_cpu_opcode_0x80() {
     cpu.registers.set_b(0x01);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x00);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), true);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 1);
 }
 
@@ -1489,10 +1489,10 @@ fn test_cpu_opcode_0x81() {
     cpu.registers.set_c(0x02);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x03);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x81]);
@@ -1500,10 +1500,10 @@ fn test_cpu_opcode_0x81() {
     cpu.registers.set_c(0xFF);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0xFE);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x81]);
@@ -1511,10 +1511,10 @@ fn test_cpu_opcode_0x81() {
     cpu.registers.set_c(0x01);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x00);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), true);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 1);
 }
 
@@ -1525,10 +1525,10 @@ fn test_cpu_opcode_0x82() {
     cpu.registers.set_d(0x02);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x03);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x82]);
@@ -1536,10 +1536,10 @@ fn test_cpu_opcode_0x82() {
     cpu.registers.set_d(0xFF);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0xFE);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x82]);
@@ -1547,10 +1547,10 @@ fn test_cpu_opcode_0x82() {
     cpu.registers.set_d(0x01);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x00);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), true);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 1);
 }
 
@@ -1561,10 +1561,10 @@ fn test_cpu_opcode_0x83() {
     cpu.registers.set_e(0x02);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x03);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x83]);
@@ -1572,10 +1572,10 @@ fn test_cpu_opcode_0x83() {
     cpu.registers.set_e(0xFF);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0xFE);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x83]);
@@ -1583,10 +1583,10 @@ fn test_cpu_opcode_0x83() {
     cpu.registers.set_e(0x01);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x00);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), true);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 1);
 }
 
@@ -1597,10 +1597,10 @@ fn test_cpu_opcode_0x84() {
     cpu.registers.set_h(0x02);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x03);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x84]);
@@ -1608,10 +1608,10 @@ fn test_cpu_opcode_0x84() {
     cpu.registers.set_h(0xFF);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0xFE);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x84]);
@@ -1619,10 +1619,10 @@ fn test_cpu_opcode_0x84() {
     cpu.registers.set_h(0x01);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x00);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), true);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 1);
 }
 
@@ -1633,10 +1633,10 @@ fn test_cpu_opcode_0x85() {
     cpu.registers.set_l(0x02);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x03);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x85]);
@@ -1644,10 +1644,10 @@ fn test_cpu_opcode_0x85() {
     cpu.registers.set_l(0xFF);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0xFE);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x85]);
@@ -1655,10 +1655,10 @@ fn test_cpu_opcode_0x85() {
     cpu.registers.set_l(0x01);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x00);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), true);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 1);
 }
 
@@ -1670,10 +1670,10 @@ fn test_cpu_opcode_0x86() {
     cpu.registers.set_hl(0xC000);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x03);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
     assert_eq!(nops, 2);
 
     cpu = cpu_from_data(&mut vec![0x86]);
@@ -1682,10 +1682,10 @@ fn test_cpu_opcode_0x86() {
     cpu.registers.set_hl(0xC000);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0xFE);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 2);
 
     cpu = cpu_from_data(&mut vec![0x86]);
@@ -1694,10 +1694,10 @@ fn test_cpu_opcode_0x86() {
     cpu.registers.set_hl(0xC000);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x00);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), true);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 2);
 }
 
@@ -1707,30 +1707,30 @@ fn test_cpu_opcode_0x87() {
     cpu.registers.set_a(0x01);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x02);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x87]);
     cpu.registers.set_a(0xFF);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0xFE);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x87]);
     cpu.registers.set_a(0x80);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x00);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), true);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
     assert_eq!(nops, 1);
 }
 
@@ -1739,73 +1739,73 @@ fn test_cpu_opcode_0x88() {
     let mut cpu = cpu_from_data(&mut vec![0x88]);
     cpu.registers.set_a(0x01);
     cpu.registers.set_b(0x02);
-    cpu.registers.get_flg().set_flg_carry(false);
+    cpu.registers.get_flags().set_carry(false);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x03);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x88]);
     cpu.registers.set_a(0xFF);
     cpu.registers.set_b(0xFF);
-    cpu.registers.get_flg().set_flg_carry(false);
+    cpu.registers.get_flags().set_carry(false);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0xFE);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x88]);
     cpu.registers.set_a(0xFF);
     cpu.registers.set_b(0x01);
-    cpu.registers.get_flg().set_flg_carry(false);
+    cpu.registers.get_flags().set_carry(false);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x00);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), true);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x88]);
     cpu.registers.set_a(0x01);
     cpu.registers.set_b(0x02);
-    cpu.registers.get_flg().set_flg_carry(true);
+    cpu.registers.get_flags().set_carry(true);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x04);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x88]);
     cpu.registers.set_a(0xFF);
     cpu.registers.set_b(0xFF);
-    cpu.registers.get_flg().set_flg_carry(true);
+    cpu.registers.get_flags().set_carry(true);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0xFF);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x88]);
     cpu.registers.set_a(0xFF);
     cpu.registers.set_b(0x00);
-    cpu.registers.get_flg().set_flg_carry(true);
+    cpu.registers.get_flags().set_carry(true);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x00);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), true);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 1);
 }
 
@@ -1814,73 +1814,73 @@ fn test_cpu_opcode_0x89() {
     let mut cpu = cpu_from_data(&mut vec![0x89]);
     cpu.registers.set_a(0x01);
     cpu.registers.set_c(0x02);
-    cpu.registers.get_flg().set_flg_carry(false);
+    cpu.registers.get_flags().set_carry(false);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x03);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x89]);
     cpu.registers.set_a(0xFF);
     cpu.registers.set_c(0xFF);
-    cpu.registers.get_flg().set_flg_carry(false);
+    cpu.registers.get_flags().set_carry(false);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0xFE);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x89]);
     cpu.registers.set_a(0xFF);
     cpu.registers.set_c(0x01);
-    cpu.registers.get_flg().set_flg_carry(false);
+    cpu.registers.get_flags().set_carry(false);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x00);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), true);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x89]);
     cpu.registers.set_a(0x01);
     cpu.registers.set_c(0x02);
-    cpu.registers.get_flg().set_flg_carry(true);
+    cpu.registers.get_flags().set_carry(true);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x04);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x89]);
     cpu.registers.set_a(0xFF);
     cpu.registers.set_c(0xFF);
-    cpu.registers.get_flg().set_flg_carry(true);
+    cpu.registers.get_flags().set_carry(true);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0xFF);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x89]);
     cpu.registers.set_a(0xFF);
     cpu.registers.set_c(0x00);
-    cpu.registers.get_flg().set_flg_carry(true);
+    cpu.registers.get_flags().set_carry(true);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x00);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), true);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 1);
 }
 
@@ -1889,73 +1889,73 @@ fn test_cpu_opcode_0x8a() {
     let mut cpu = cpu_from_data(&mut vec![0x8A]);
     cpu.registers.set_a(0x01);
     cpu.registers.set_d(0x02);
-    cpu.registers.get_flg().set_flg_carry(false);
+    cpu.registers.get_flags().set_carry(false);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x03);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x8A]);
     cpu.registers.set_a(0xFF);
     cpu.registers.set_d(0xFF);
-    cpu.registers.get_flg().set_flg_carry(false);
+    cpu.registers.get_flags().set_carry(false);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0xFE);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x8A]);
     cpu.registers.set_a(0xFF);
     cpu.registers.set_d(0x01);
-    cpu.registers.get_flg().set_flg_carry(false);
+    cpu.registers.get_flags().set_carry(false);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x00);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), true);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x8A]);
     cpu.registers.set_a(0x01);
     cpu.registers.set_d(0x02);
-    cpu.registers.get_flg().set_flg_carry(true);
+    cpu.registers.get_flags().set_carry(true);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x04);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x8A]);
     cpu.registers.set_a(0xFF);
     cpu.registers.set_d(0xFF);
-    cpu.registers.get_flg().set_flg_carry(true);
+    cpu.registers.get_flags().set_carry(true);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0xFF);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x8A]);
     cpu.registers.set_a(0xFF);
     cpu.registers.set_d(0x00);
-    cpu.registers.get_flg().set_flg_carry(true);
+    cpu.registers.get_flags().set_carry(true);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x00);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), true);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 1);
 }
 
@@ -1964,73 +1964,73 @@ fn test_cpu_opcode_0x8b() {
     let mut cpu = cpu_from_data(&mut vec![0x8B]);
     cpu.registers.set_a(0x01);
     cpu.registers.set_e(0x02);
-    cpu.registers.get_flg().set_flg_carry(false);
+    cpu.registers.get_flags().set_carry(false);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x03);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x8B]);
     cpu.registers.set_a(0xFF);
     cpu.registers.set_e(0xFF);
-    cpu.registers.get_flg().set_flg_carry(false);
+    cpu.registers.get_flags().set_carry(false);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0xFE);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x8B]);
     cpu.registers.set_a(0xFF);
     cpu.registers.set_e(0x01);
-    cpu.registers.get_flg().set_flg_carry(false);
+    cpu.registers.get_flags().set_carry(false);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x00);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), true);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x8B]);
     cpu.registers.set_a(0x01);
     cpu.registers.set_e(0x02);
-    cpu.registers.get_flg().set_flg_carry(true);
+    cpu.registers.get_flags().set_carry(true);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x04);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x8B]);
     cpu.registers.set_a(0xFF);
     cpu.registers.set_e(0xFF);
-    cpu.registers.get_flg().set_flg_carry(true);
+    cpu.registers.get_flags().set_carry(true);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0xFF);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x8B]);
     cpu.registers.set_a(0xFF);
     cpu.registers.set_e(0x00);
-    cpu.registers.get_flg().set_flg_carry(true);
+    cpu.registers.get_flags().set_carry(true);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x00);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), true);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 1);
 }
 
@@ -2039,73 +2039,73 @@ fn test_cpu_opcode_0x8c() {
     let mut cpu = cpu_from_data(&mut vec![0x8C]);
     cpu.registers.set_a(0x01);
     cpu.registers.set_h(0x02);
-    cpu.registers.get_flg().set_flg_carry(false);
+    cpu.registers.get_flags().set_carry(false);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x03);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x8C]);
     cpu.registers.set_a(0xFF);
     cpu.registers.set_h(0xFF);
-    cpu.registers.get_flg().set_flg_carry(false);
+    cpu.registers.get_flags().set_carry(false);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0xFE);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x8C]);
     cpu.registers.set_a(0xFF);
     cpu.registers.set_h(0x01);
-    cpu.registers.get_flg().set_flg_carry(false);
+    cpu.registers.get_flags().set_carry(false);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x00);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), true);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x8C]);
     cpu.registers.set_a(0x01);
     cpu.registers.set_h(0x02);
-    cpu.registers.get_flg().set_flg_carry(true);
+    cpu.registers.get_flags().set_carry(true);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x04);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x8C]);
     cpu.registers.set_a(0xFF);
     cpu.registers.set_h(0xFF);
-    cpu.registers.get_flg().set_flg_carry(true);
+    cpu.registers.get_flags().set_carry(true);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0xFF);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x8C]);
     cpu.registers.set_a(0xFF);
     cpu.registers.set_h(0x00);
-    cpu.registers.get_flg().set_flg_carry(true);
+    cpu.registers.get_flags().set_carry(true);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x00);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), true);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 1);
 }
 
@@ -2114,73 +2114,73 @@ fn test_cpu_opcode_0x8d() {
     let mut cpu = cpu_from_data(&mut vec![0x8D]);
     cpu.registers.set_a(0x01);
     cpu.registers.set_l(0x02);
-    cpu.registers.get_flg().set_flg_carry(false);
+    cpu.registers.get_flags().set_carry(false);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x03);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x8D]);
     cpu.registers.set_a(0xFF);
     cpu.registers.set_l(0xFF);
-    cpu.registers.get_flg().set_flg_carry(false);
+    cpu.registers.get_flags().set_carry(false);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0xFE);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x8D]);
     cpu.registers.set_a(0xFF);
     cpu.registers.set_l(0x01);
-    cpu.registers.get_flg().set_flg_carry(false);
+    cpu.registers.get_flags().set_carry(false);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x00);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), true);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x8D]);
     cpu.registers.set_a(0x01);
     cpu.registers.set_l(0x02);
-    cpu.registers.get_flg().set_flg_carry(true);
+    cpu.registers.get_flags().set_carry(true);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x04);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x8D]);
     cpu.registers.set_a(0xFF);
     cpu.registers.set_l(0xFF);
-    cpu.registers.get_flg().set_flg_carry(true);
+    cpu.registers.get_flags().set_carry(true);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0xFF);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x8D]);
     cpu.registers.set_a(0xFF);
     cpu.registers.set_l(0x00);
-    cpu.registers.get_flg().set_flg_carry(true);
+    cpu.registers.get_flags().set_carry(true);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x00);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), true);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 1);
 }
 
@@ -2190,78 +2190,78 @@ fn test_cpu_opcode_0x8e() {
     cpu.registers.set_a(0x01);
     cpu.mmu.wb(0xC000, 0x02);
     cpu.registers.set_hl(0xC000);
-    cpu.registers.get_flg().set_flg_carry(false);
+    cpu.registers.get_flags().set_carry(false);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x03);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
     assert_eq!(nops, 2);
 
     cpu = cpu_from_data(&mut vec![0x8E]);
     cpu.registers.set_a(0xFF);
     cpu.mmu.wb(0xC000, 0xFF);
     cpu.registers.set_hl(0xC000);
-    cpu.registers.get_flg().set_flg_carry(false);
+    cpu.registers.get_flags().set_carry(false);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0xFE);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 2);
 
     cpu = cpu_from_data(&mut vec![0x8E]);
     cpu.registers.set_a(0xFF);
     cpu.mmu.wb(0xC000, 0x01);
     cpu.registers.set_hl(0xC000);
-    cpu.registers.get_flg().set_flg_carry(false);
+    cpu.registers.get_flags().set_carry(false);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x00);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), true);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 2);
 
     let mut cpu = cpu_from_data(&mut vec![0x8E]);
     cpu.registers.set_a(0x01);
     cpu.mmu.wb(0xC000, 0x02);
     cpu.registers.set_hl(0xC000);
-    cpu.registers.get_flg().set_flg_carry(true);
+    cpu.registers.get_flags().set_carry(true);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x04);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
     assert_eq!(nops, 2);
 
     cpu = cpu_from_data(&mut vec![0x8E]);
     cpu.registers.set_a(0xFF);
     cpu.mmu.wb(0xC000, 0xFF);
     cpu.registers.set_hl(0xC000);
-    cpu.registers.get_flg().set_flg_carry(true);
+    cpu.registers.get_flags().set_carry(true);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0xFF);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 2);
 
     cpu = cpu_from_data(&mut vec![0x8E]);
     cpu.registers.set_a(0xFF);
     cpu.mmu.wb(0xC000, 0x00);
     cpu.registers.set_hl(0xC000);
-    cpu.registers.get_flg().set_flg_carry(true);
+    cpu.registers.get_flags().set_carry(true);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x00);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), true);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 2);
 }
 
@@ -2269,68 +2269,68 @@ fn test_cpu_opcode_0x8e() {
 fn test_cpu_opcode_0x8f() {
     let mut cpu = cpu_from_data(&mut vec![0x8F]);
     cpu.registers.set_a(0x01);
-    cpu.registers.get_flg().set_flg_carry(false);
+    cpu.registers.get_flags().set_carry(false);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x02);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x8F]);
     cpu.registers.set_a(0xFF);
-    cpu.registers.get_flg().set_flg_carry(false);
+    cpu.registers.get_flags().set_carry(false);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0xFE);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x8F]);
     cpu.registers.set_a(0x80);
-    cpu.registers.get_flg().set_flg_carry(false);
+    cpu.registers.get_flags().set_carry(false);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x00);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), true);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
     assert_eq!(nops, 1);
 
     let mut cpu = cpu_from_data(&mut vec![0x8F]);
     cpu.registers.set_a(0x01);
-    cpu.registers.get_flg().set_flg_carry(true);
+    cpu.registers.get_flags().set_carry(true);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x03);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x8F]);
     cpu.registers.set_a(0xFF);
-    cpu.registers.get_flg().set_flg_carry(true);
+    cpu.registers.get_flags().set_carry(true);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0xFF);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 1);
 
     cpu = cpu_from_data(&mut vec![0x8F]);
     cpu.registers.set_a(0x80);
-    cpu.registers.get_flg().set_flg_carry(true);
+    cpu.registers.get_flags().set_carry(true);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x01);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
     assert_eq!(nops, 1);
 }
 
@@ -2341,30 +2341,30 @@ fn test_cpu_opcode_0xc6() {
     cpu.registers.set_a(0x01);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x03);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
     assert_eq!(nops, 2);
 
     cpu = cpu_from_data(&mut vec![0xC6, 0xFF]);
     cpu.registers.set_a(0xFF);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0xFE);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 2);
 
     cpu = cpu_from_data(&mut vec![0xC6, 0x01]);
     cpu.registers.set_a(0xFF);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x00);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), true);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 2);
 }
 
@@ -2373,68 +2373,68 @@ fn test_cpu_opcode_0xce() {
     // Same template as opcodes 0x80-0x86
     let mut cpu = cpu_from_data(&mut vec![0xCE, 0x02]);
     cpu.registers.set_a(0x01);
-    cpu.registers.get_flg().set_flg_carry(false);
+    cpu.registers.get_flags().set_carry(false);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x03);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
     assert_eq!(nops, 2);
 
     cpu = cpu_from_data(&mut vec![0xCE, 0xFF]);
     cpu.registers.set_a(0xFF);
-    cpu.registers.get_flg().set_flg_carry(false);
+    cpu.registers.get_flags().set_carry(false);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0xFE);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 2);
 
     cpu = cpu_from_data(&mut vec![0xCE, 0x01]);
     cpu.registers.set_a(0xFF);
-    cpu.registers.get_flg().set_flg_carry(false);
+    cpu.registers.get_flags().set_carry(false);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x00);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), true);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 2);
 
     cpu = cpu_from_data(&mut vec![0xCE, 0x02]);
     cpu.registers.set_a(0x01);
-    cpu.registers.get_flg().set_flg_carry(true);
+    cpu.registers.get_flags().set_carry(true);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x04);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
     assert_eq!(nops, 2);
 
     cpu = cpu_from_data(&mut vec![0xCE, 0xFF]);
     cpu.registers.set_a(0xFF);
-    cpu.registers.get_flg().set_flg_carry(true);
+    cpu.registers.get_flags().set_carry(true);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0xFF);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 2);
 
     cpu = cpu_from_data(&mut vec![0xCE, 0x00]);
     cpu.registers.set_a(0xFF);
-    cpu.registers.get_flg().set_flg_carry(true);
+    cpu.registers.get_flags().set_carry(true);
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_a(), 0x00);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), true);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 2);
 }
 
@@ -2508,10 +2508,10 @@ fn test_cpu_opcode_0xf8() {
     cpu.registers.set_hl(0x13); // Random, should be overwritten
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_hl(), 0);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
     assert_eq!(nops, 3);
 
     cpu = cpu_from_data(&mut vec![0xF8, 0xFF]); // LD HL, SP-1
@@ -2519,10 +2519,10 @@ fn test_cpu_opcode_0xf8() {
     cpu.registers.set_hl(0x66); // Random, should be overwritten
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_hl(), 0xFFFF);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), false);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), false);
     assert_eq!(nops, 3);
 
     cpu = cpu_from_data(&mut vec![0xF8, 0xFF]); // LD HL, SP-1
@@ -2530,10 +2530,10 @@ fn test_cpu_opcode_0xf8() {
     cpu.registers.set_hl(0x66); // Random, should be overwritten
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_hl(), 0xFE);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 3);
 
     cpu = cpu_from_data(&mut vec![0xF8, 0x7F]);
@@ -2541,10 +2541,10 @@ fn test_cpu_opcode_0xf8() {
     cpu.registers.set_hl(0x51); // Random, should be overwritten
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_hl(), 0x17E);
-    assert_eq!(cpu.registers.get_flg().get_flg_sub(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_zero(), false);
-    assert_eq!(cpu.registers.get_flg().get_flg_carry(), true);
-    assert_eq!(cpu.registers.get_flg().get_flg_half_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_sub(), false);
+    assert_eq!(cpu.registers.get_flags().get_zero(), false);
+    assert_eq!(cpu.registers.get_flags().get_carry(), true);
+    assert_eq!(cpu.registers.get_flags().get_hcarry(), true);
     assert_eq!(nops, 3);
 }
 
