@@ -1,4 +1,4 @@
-use crate::lib::cpu_registers::{FLG_HCARRY, FLG_SUB, FLG_ZERO};
+use crate::lib::cpu_registers::{FLG_CARRY, FLG_HCARRY, FLG_SUB, FLG_ZERO};
 
 fn cpu_from_data(data: &mut Vec<u8>) -> super::CPU {
     let mut cpu = super::CPU::new();
@@ -138,6 +138,65 @@ fn test_cpu_opcode_0x06() {
 }
 
 #[test]
+
+fn test_cpu_opcode_0x07() {
+    let mut cpu = cpu_from_data(&mut vec![0x07, 0x07]);
+    cpu.registers.set_a(0b0100_0000);
+    assert_eq!(cpu.exec_inst(), 1);
+    assert_eq!(cpu.registers.get_a(), 0b1000_0000);
+    assert_eq!(cpu.registers.get_flags().get_value(), 0);
+    assert_eq!(cpu.exec_inst(), 1);
+    assert_eq!(cpu.registers.get_a(), 0b0000_0001);
+    assert_eq!(cpu.registers.get_flags().get_value(), FLG_CARRY);
+}
+
+#[test]
+fn test_cpu_opcode_0x08() {
+    let mut cpu = cpu_from_data(&mut vec![0x08, 0x00, 0x40, 0x08, 0x00, 0x40]);
+    cpu.registers.set_sp(0x8888);
+    assert_eq!(cpu.exec_inst(), 5);
+    assert_eq!(cpu.mmu.rb(0x4000), 0x88);
+    assert_eq!(cpu.mmu.rb(0x4000), 0x88);
+    assert_eq!(cpu.registers.get_flags().get_value(), 0);
+    cpu.registers
+        .get_flags()
+        .set_value(FLG_CARRY | FLG_HCARRY | FLG_SUB | FLG_ZERO);
+    assert_eq!(cpu.exec_inst(), 5);
+    assert_eq!(cpu.mmu.rb(0x4000), 0x88);
+    assert_eq!(cpu.mmu.rb(0x4000), 0x88);
+    assert_eq!(
+        cpu.registers.get_flags().get_value(),
+        FLG_CARRY | FLG_HCARRY | FLG_SUB | FLG_ZERO
+    );
+}
+
+#[test]
+fn test_cpu_opcode_0x09() {
+    let mut cpu = cpu_from_data(&mut vec![0x09, 0x09, 0x09]);
+    cpu.registers.get_flags().set_value(FLG_SUB);
+    cpu.registers.set_hl(0x0070);
+    cpu.registers.set_bc(0x0080);
+    assert_eq!(cpu.exec_inst(), 2);
+    assert_eq!(cpu.registers.get_hl(), 0x00F0);
+    assert_eq!(cpu.registers.get_flags().get_value(), 0);
+
+    cpu.registers.set_hl(0x9000);
+    cpu.registers.set_bc(0x8000);
+    assert_eq!(cpu.exec_inst(), 2);
+    assert_eq!(cpu.registers.get_hl(), 0x1000);
+    assert_eq!(cpu.registers.get_flags().get_value(), FLG_CARRY);
+
+    cpu.registers.set_hl(0x9900);
+    cpu.registers.set_bc(0x8800);
+    assert_eq!(cpu.exec_inst(), 2);
+    assert_eq!(cpu.registers.get_hl(), 0x2100);
+    assert_eq!(
+        cpu.registers.get_flags().get_value(),
+        FLG_CARRY | FLG_HCARRY
+    );
+}
+
+#[test]
 fn test_cpu_opcode_0x0a() {
     let mut cpu = cpu_from_data(&mut vec![0x0A]);
     let addr = 0xFF80;
@@ -149,6 +208,24 @@ fn test_cpu_opcode_0x0a() {
     // Expect register A to have this value
     assert_eq!(cpu.registers.get_a(), value);
     assert_eq!(nops, 2);
+}
+
+#[test]
+fn test_cpu_opcode_0x0b() {
+    let mut cpu = cpu_from_data(&mut vec![0x0B, 0x0B, 0x0B]);
+    cpu.registers.set_bc(0x0001);
+    assert_eq!(cpu.exec_inst(), 2);
+    assert_eq!(cpu.registers.get_bc(), 0x0000);
+    assert_eq!(cpu.registers.get_flags().get_value(), 0);
+    cpu.registers
+        .get_flags()
+        .set_value(FLG_CARRY | FLG_HCARRY | FLG_SUB | FLG_ZERO);
+    assert_eq!(cpu.exec_inst(), 2);
+    assert_eq!(cpu.registers.get_bc(), 0xFFFF);
+    assert_eq!(
+        cpu.registers.get_flags().get_value(),
+        FLG_CARRY | FLG_HCARRY | FLG_SUB | FLG_ZERO
+    );
 }
 
 #[test]
@@ -210,6 +287,19 @@ fn test_cpu_opcode_0x0e() {
     // Expect register A to have this value
     assert_eq!(cpu.registers.get_c(), value);
     assert_eq!(nops, 2);
+}
+
+#[test]
+
+fn test_cpu_opcode_0x0f() {
+    let mut cpu = cpu_from_data(&mut vec![0x0F, 0x0F]);
+    cpu.registers.set_a(0b0000_0010);
+    assert_eq!(cpu.exec_inst(), 1);
+    assert_eq!(cpu.registers.get_a(), 0b0000_0001);
+    assert_eq!(cpu.registers.get_flags().get_value(), 0);
+    assert_eq!(cpu.exec_inst(), 1);
+    assert_eq!(cpu.registers.get_a(), 0b1000_0000);
+    assert_eq!(cpu.registers.get_flags().get_value(), FLG_CARRY);
 }
 
 #[test]
@@ -319,6 +409,48 @@ fn test_cpu_opcode_0x16() {
 }
 
 #[test]
+fn test_cpu_opcode_0x17() {
+    let mut cpu = cpu_from_data(&mut vec![0x17, 0x17, 0x17]);
+    cpu.registers.set_a(0b0100_0000);
+    assert_eq!(cpu.exec_inst(), 1);
+    assert_eq!(cpu.registers.get_a(), 0b1000_0000);
+    assert_eq!(cpu.registers.get_flags().get_value(), 0);
+    assert_eq!(cpu.exec_inst(), 1);
+    assert_eq!(cpu.registers.get_a(), 0b0000_0000);
+    assert_eq!(cpu.registers.get_flags().get_value(), FLG_CARRY | FLG_ZERO);
+    cpu.registers.set_a(0b1100_0000);
+    assert_eq!(cpu.exec_inst(), 1);
+    assert_eq!(cpu.registers.get_a(), 0b1000_0001); // Carry from previous op added
+    assert_eq!(cpu.registers.get_flags().get_value(), FLG_CARRY);
+}
+
+#[test]
+fn test_cpu_opcode_0x19() {
+    let mut cpu = cpu_from_data(&mut vec![0x19, 0x19, 0x19]);
+    cpu.registers.get_flags().set_value(FLG_SUB);
+    cpu.registers.set_hl(0x0070);
+    cpu.registers.set_de(0x0080);
+    assert_eq!(cpu.exec_inst(), 2);
+    assert_eq!(cpu.registers.get_hl(), 0x00F0);
+    assert_eq!(cpu.registers.get_flags().get_value(), 0);
+
+    cpu.registers.set_hl(0x9000);
+    cpu.registers.set_de(0x8000);
+    assert_eq!(cpu.exec_inst(), 2);
+    assert_eq!(cpu.registers.get_hl(), 0x1000);
+    assert_eq!(cpu.registers.get_flags().get_value(), FLG_CARRY);
+
+    cpu.registers.set_hl(0x9900);
+    cpu.registers.set_de(0x8800);
+    assert_eq!(cpu.exec_inst(), 2);
+    assert_eq!(cpu.registers.get_hl(), 0x2100);
+    assert_eq!(
+        cpu.registers.get_flags().get_value(),
+        FLG_CARRY | FLG_HCARRY
+    );
+}
+
+#[test]
 fn test_cpu_opcode_0x1a() {
     let value = 0x13;
     let addr = 0xFF80;
@@ -330,6 +462,24 @@ fn test_cpu_opcode_0x1a() {
     // Expect A to contain the contents of location DE in memory
     assert_eq!(cpu.registers.get_a(), value);
     assert_eq!(nops, 2);
+}
+
+#[test]
+fn test_cpu_opcode_0x1b() {
+    let mut cpu = cpu_from_data(&mut vec![0x1B, 0x1B, 0x1B]);
+    cpu.registers.set_de(0x0001);
+    assert_eq!(cpu.exec_inst(), 2);
+    assert_eq!(cpu.registers.get_de(), 0x0000);
+    assert_eq!(cpu.registers.get_flags().get_value(), 0);
+    cpu.registers
+        .get_flags()
+        .set_value(FLG_CARRY | FLG_HCARRY | FLG_SUB | FLG_ZERO);
+    assert_eq!(cpu.exec_inst(), 2);
+    assert_eq!(cpu.registers.get_de(), 0xFFFF);
+    assert_eq!(
+        cpu.registers.get_flags().get_value(),
+        FLG_CARRY | FLG_HCARRY | FLG_SUB | FLG_ZERO
+    );
 }
 
 #[test]
@@ -390,6 +540,22 @@ fn test_cpu_opcode_0x1e() {
     let nops = cpu.exec_inst();
     assert_eq!(cpu.registers.get_e(), value);
     assert_eq!(nops, 2);
+}
+
+#[test]
+fn test_cpu_opcode_0x1f() {
+    let mut cpu = cpu_from_data(&mut vec![0x1f, 0x1f, 0x1f]);
+    cpu.registers.set_a(0b0000_0010);
+    assert_eq!(cpu.exec_inst(), 1);
+    assert_eq!(cpu.registers.get_a(), 0b0000_0001);
+    assert_eq!(cpu.registers.get_flags().get_value(), 0);
+    assert_eq!(cpu.exec_inst(), 1);
+    assert_eq!(cpu.registers.get_a(), 0b0000_0000);
+    assert_eq!(cpu.registers.get_flags().get_value(), FLG_CARRY | FLG_ZERO);
+    cpu.registers.set_a(0b0000_0001);
+    assert_eq!(cpu.exec_inst(), 1);
+    assert_eq!(cpu.registers.get_a(), 0b1000_0000); // Carry from previous op added
+    assert_eq!(cpu.registers.get_flags().get_value(), FLG_CARRY);
 }
 
 #[test]
@@ -499,6 +665,29 @@ fn test_cpu_opcode_0x26() {
 }
 
 #[test]
+fn test_cpu_opcode_0x29() {
+    let mut cpu = cpu_from_data(&mut vec![0x29, 0x29, 0x29]);
+    cpu.registers.get_flags().set_value(FLG_SUB);
+    cpu.registers.set_hl(0x0070);
+    assert_eq!(cpu.exec_inst(), 2);
+    assert_eq!(cpu.registers.get_hl(), 0x00E0);
+    assert_eq!(cpu.registers.get_flags().get_value(), 0);
+
+    cpu.registers.set_hl(0x8000);
+    assert_eq!(cpu.exec_inst(), 2);
+    assert_eq!(cpu.registers.get_hl(), 0x0000);
+    assert_eq!(cpu.registers.get_flags().get_value(), FLG_CARRY);
+
+    cpu.registers.set_hl(0x8800);
+    assert_eq!(cpu.exec_inst(), 2);
+    assert_eq!(cpu.registers.get_hl(), 0x1000);
+    assert_eq!(
+        cpu.registers.get_flags().get_value(),
+        FLG_CARRY | FLG_HCARRY
+    );
+}
+
+#[test]
 fn test_cpu_opcode_0x2a() {
     let value = 0x55;
     let addr = 0xFF80;
@@ -510,6 +699,24 @@ fn test_cpu_opcode_0x2a() {
     assert_eq!(cpu.registers.get_a(), value);
     assert_eq!(cpu.registers.get_hl(), addr + 1);
     assert_eq!(nops, 2);
+}
+
+#[test]
+fn test_cpu_opcode_0x2b() {
+    let mut cpu = cpu_from_data(&mut vec![0x2B, 0x2B, 0x2B]);
+    cpu.registers.set_hl(0x0001);
+    assert_eq!(cpu.exec_inst(), 2);
+    assert_eq!(cpu.registers.get_hl(), 0x0000);
+    assert_eq!(cpu.registers.get_flags().get_value(), 0);
+    cpu.registers
+        .get_flags()
+        .set_value(FLG_CARRY | FLG_HCARRY | FLG_SUB | FLG_ZERO);
+    assert_eq!(cpu.exec_inst(), 2);
+    assert_eq!(cpu.registers.get_hl(), 0xFFFF);
+    assert_eq!(
+        cpu.registers.get_flags().get_value(),
+        FLG_CARRY | FLG_HCARRY | FLG_SUB | FLG_ZERO
+    );
 }
 
 #[test]
@@ -667,6 +874,32 @@ fn test_cpu_opcode_0x36() {
 }
 
 #[test]
+fn test_cpu_opcode_0x39() {
+    let mut cpu = cpu_from_data(&mut vec![0x39, 0x39, 0x39]);
+    cpu.registers.get_flags().set_value(FLG_SUB);
+    cpu.registers.set_hl(0x0070);
+    cpu.registers.set_sp(0x0080);
+    assert_eq!(cpu.exec_inst(), 2);
+    assert_eq!(cpu.registers.get_hl(), 0x00F0);
+    assert_eq!(cpu.registers.get_flags().get_value(), 0);
+
+    cpu.registers.set_hl(0x9000);
+    cpu.registers.set_sp(0x8000);
+    assert_eq!(cpu.exec_inst(), 2);
+    assert_eq!(cpu.registers.get_hl(), 0x1000);
+    assert_eq!(cpu.registers.get_flags().get_value(), FLG_CARRY);
+
+    cpu.registers.set_hl(0x9900);
+    cpu.registers.set_sp(0x8800);
+    assert_eq!(cpu.exec_inst(), 2);
+    assert_eq!(cpu.registers.get_hl(), 0x2100);
+    assert_eq!(
+        cpu.registers.get_flags().get_value(),
+        FLG_CARRY | FLG_HCARRY
+    );
+}
+
+#[test]
 fn test_cpu_opcode_0x3a() {
     let value = 0x71;
     let addr = 0xFF80;
@@ -678,6 +911,24 @@ fn test_cpu_opcode_0x3a() {
     assert_eq!(cpu.registers.get_a(), value);
     assert_eq!(cpu.registers.get_hl(), addr - 1);
     assert_eq!(nops, 2);
+}
+
+#[test]
+fn test_cpu_opcode_0x3b() {
+    let mut cpu = cpu_from_data(&mut vec![0x3B, 0x3B, 0x3B]);
+    cpu.registers.set_sp(0x0001);
+    assert_eq!(cpu.exec_inst(), 2);
+    assert_eq!(cpu.registers.get_sp(), 0x0000);
+    assert_eq!(cpu.registers.get_flags().get_value(), 0);
+    cpu.registers
+        .get_flags()
+        .set_value(FLG_CARRY | FLG_HCARRY | FLG_SUB | FLG_ZERO);
+    assert_eq!(cpu.exec_inst(), 2);
+    assert_eq!(cpu.registers.get_sp(), 0xFFFF);
+    assert_eq!(
+        cpu.registers.get_flags().get_value(),
+        FLG_CARRY | FLG_HCARRY | FLG_SUB | FLG_ZERO
+    );
 }
 
 #[test]
